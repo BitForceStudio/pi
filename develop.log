@@ -1,0 +1,16 @@
+1: save url to local hard drive                          | X
+2: auto detect name                                      | X
+3: add a loop, type exit to end the program              | X
+4: multi-url download                                    | O
+   4.1 : read a file, which list the urls need to be 
+         downloaded.                                     | O
+
+
+
+
+
+
+
+
+Pickbits:
+1: save test image to /var/www/html/pickbits/images      | X
