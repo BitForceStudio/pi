@@ -1,13 +1,23 @@
 1: save url to local hard drive                          | X
+
 2: auto detect name                                      | X
+
 3: add a loop, type exit to end the program              | X
+
 4: multi-url download                                    | O
-   4.1 : read a file, which list the urls need to be 
+    4.1 : read a file, which list the urls need to be 
          downloaded.                                     || X
-   4.2 : auto-name-setting mode                          || X
-   4.3 : defualt url list file name mode and manully
+    4.2 : auto-name-setting mode                          || X
+    4.3 : defualt url list file name mode and manully
          set url list file name mode                     || X
-   4.4 : since name wrong, list the .list file in 
+    4.4 : since name wrong, list the .list file in 
          current directory for user to choose            || O
-5: set the directory manully                             | X
+
+5: set the directory manully                             | XO
+
+6: save html to pdf                                      | O
+    6.1 : install pdfkit.py                              | O
+    6.2 : detect content automatically, if not pdf
+          then use this function                         | O
+
 
