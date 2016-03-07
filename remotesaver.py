@@ -51,7 +51,7 @@ def main():
             printhelp()
 
 def printhelp():
-    print "-------------input file url to download file-------------"
+    print "------------- download file to my pi -------------"
     print "url FILEURLADDRESS          download file from FILEURLADDRESS"
     print "read                        read url from url.list (default) to download files"
     print "read auto                   automatically read url and detect name from url.list. (USER CANNOT CHANGE THE FILE NAME DURING THE DOWNLOAD PROCESS)"
