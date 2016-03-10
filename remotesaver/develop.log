@@ -4,7 +4,7 @@
 
 3: add a loop, type exit to end the program              | X
 
-4: multi-url download                                    | O
+4: multi-url download                                    | XO
     4.1 : read a file, which list the urls need to be 
          downloaded.                                     || X
     4.2 : auto-name-setting mode                         || X
@@ -13,12 +13,11 @@
     4.4 : since name wrong, list the .list file in 
          current directory for user to choose            || O
 
-5: set the directory manully                             | XO
+5: set the directory manully                             | X
 
-6: save html to pdf                                      | O
-    6.1 : install pdfkit.py                              | O
-    6.2 : detect content automatically, if not pdf
-          then use this function                         | O
+6: save html to pdf                                      | X
+    6.1 : install pdfkit.py                              | X
+    6.2 : set new mode html, save html to pdf            | X
 
 7: write a downloading script                            | O
     7.1 : write a automatic downloading script, to

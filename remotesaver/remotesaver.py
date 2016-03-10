@@ -1,9 +1,11 @@
 import urllib2
-g_qdebug = 0
+import pdfkit
+
+g_qdebug = 1
 
 def main():
     global qgdebug
-    dlocation = "/media/pi/Doc/remotesaved"     #default locaiton
+    dlocation = "/media/pi/Doc/remotesaved/"     #default locaiton
     printhelp()
     while 1:
         cmd = raw_input(">>")
@@ -36,6 +38,29 @@ def main():
                 readurls(ulistname,1,locaiton)
             else:
                 readurls(ulistname,0,locaiton)
+        elif len(cmd)>11 and cmd[0:11]=="download to":
+            tlen = len(cmd)
+            dlocation = cmd[12:tlen]
+            if g_qdebug == 1:
+                print "Global saving direction saved to "+dlocation
+        elif len(cmd)>4 and cmd[0:4]=="html":
+            fname = "temp.pdf"
+            print "Save html to pdf file"
+            tlen = len(cmd)
+            url = cmd[5:tlen]
+            if g_qdebug == 1:
+                print url
+            fname = raw_input("Input file name:")
+            nlen = len(fname)
+            if nlen<1:
+                fname="temp.pdf"
+            if nlen>4 and fname[nlen-4:nlen]==".pdf":
+                fname = fname
+            else:
+                fname = fname+".pdf"
+            if g_qdebug:
+                print fname
+            download_html_to_pdf(url,fname,locaiton)
         elif len(cmd)>3 and cmd[0:3]=="url":
             fname = "temp.pdf"
             tlen = len(cmd)
@@ -61,13 +86,14 @@ def printhelp():
     print "read from FILENAME          read url from FILENAME"
     print "read auto from FILENAME     read url, autoset downlad file name, from FILENAME"
     print "download to DIRECTORY       set the downlaod to directory manully. default is /media/pi/Doc/remotesaved"
+    print "html                        save html to pdf file"
     print "help                        show help message"
     print "exit                        end this program"
 
 def readurls(filename,qautoname,location):
     i = 0
     global g_qdebug
-    location = ""
+
     if len(filename) == 0:
         return
     try:
@@ -96,7 +122,7 @@ def readurls(filename,qautoname,location):
                 i=i+1
         print 'download finished'
     except IOError:
-        print "Fail to read file"+ filename
+        print "Fail to read file "+ filename
         return
 
 
@@ -111,6 +137,14 @@ def download_file(url,fname,location):
         print("Completed")
     else:
         print("undefined url or file name")
+
+def download_html_to_pdf(url,fname,location):
+    if(url and fname):
+        print "Save "+fname+" from "+url+" to "+location
+        pdfkit.from_url(url,location+fname)
+        print "Completed"
+    else:
+        print "Undefined url or file name"
 
 def autoname(url):
     i=0
