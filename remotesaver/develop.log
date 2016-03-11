@@ -18,6 +18,7 @@
 6: save html to pdf                                      | X
     6.1 : install pdfkit.py                              | X
     6.2 : set new mode html, save html to pdf            | X
+    6.3 : get name smartly                               | O
 
 7: write a downloading script                            | O
     7.1 : write a automatic downloading script, to
