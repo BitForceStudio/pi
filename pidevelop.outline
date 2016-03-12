@@ -4,3 +4,6 @@
 2: django server                                                            -- on process
 3: GPIO control                                                             -- on mind status...
 4: Node RED IoT                                                             -- on mind status...
+    4.1: tweet - email tryout 
+    4.2: Sunfounder + Pi
+    4.3: ui
