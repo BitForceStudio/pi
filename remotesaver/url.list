@@ -1,0 +1,19 @@
+download to /media/pi/Doc/remotesaved/
+
+auto
+url https://www.raspberrypi.org/magpi-issues/MagPi18.pdf
+url https://www.raspberrypi.org/magpi-issues/MagPi17.pdf
+url https://www.raspberrypi.org/magpi-issues/MagPi16.pdf
+/
+
+manul
+url https://www.raspberrypi.org/magpi-issues/MagPi15.pdf -> Magpi_15.pdf
+url https://www.raspberrypi.org/magpi-issues/MagPi14.pdf -> Magpi_14.pdf
+/
+
+download to /media/pi/Doc/
+
+manul
+html http://www.google.com -> google.pdf
+html https://en.wikipedia.org/wiki/Jacob_van_Ruisdael -> jacob_van_ruisdael
+/
