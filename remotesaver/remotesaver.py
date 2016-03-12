@@ -178,8 +178,9 @@ def readurls(filename,qautoname,location):
                             print "out of the box"
                         inbox = 0
                     else:
-                        print line
-                        print dlocation
+                        if g_qdebug==1:
+                            print line
+                            print dlocation
                         start(line,dlocation,1)
                 else:
                     print inbox 
