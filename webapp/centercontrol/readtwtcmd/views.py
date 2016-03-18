@@ -7,7 +7,7 @@ def index(request):
 
 def readtwtmsg(request):
     respond = 'abcdef'
-    body = simplejson.loads(request.body)
+    body = request.body
     try:
         respond = body
     except ValueError as e:
