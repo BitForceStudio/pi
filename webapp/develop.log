@@ -1,2 +1,7 @@
-1: build a django server
-2: put the remotedownload with the server:
+1: build a django server:                                                   | OX
+	1.1: communicate with node red                                          |-| X
+	1.2: anaylise the tweet get from node red.                              |-| X
+	1.3: pattern: url http://*** -> filename.pdf                            |-| X
+        1.4: pattern: take picture                                              |-| O
+2: put the remotedownload with the server:                                  | OX
+    2.1: call remote saver from the django                                  |-| X
