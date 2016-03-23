@@ -1,8 +1,8 @@
-1: control servo                                                |   O
-    1.1 using UNO to control servo                              |-| O
-    1.2 using RPi sending command to UNO                        |-| O
+1: basic servo control                                          |   X
+    1.1 using GPIO.PWM to control servo                         |-| X
+    1.2 RPi control servo by angle                              |-| X  (not yet figure out the mapping)
 2: control servo via tweeter                                    |   O
-    2.1 run django in RPi                                       |-| O
-    2.2 using django to control UNO & Servo                     |-| O
-    2.3 connect to Node red.                                    |-| O
+    2.1 run django server of servo control in RPi3              |-| O
+    2.2 create a client to receive command from server          |-| O
+    2.3 implement servo control to the net-client               |-| O
     2.4 using tweeter to control servo                          |-| O
