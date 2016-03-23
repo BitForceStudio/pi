@@ -18,5 +18,6 @@ from django.contrib import admin
 
 urlpatterns = [
     url(r'^readtwtcmd/',include('readtwtcmd.urls')),
+    url(r'^readebay/',include('readebay.urls')),
     url(r'^admin/', admin.site.urls),
 ]
