@@ -7,3 +7,9 @@
     4.1: tweet - email tryout                                               -- partly finished. save to file
     4.2: Sunfounder + Pi
     4.3: nodered ui
+5: Twitter topic relations                                         
+    5.1: set twitter keywords for node red 
+    5.2: send tweets to the server.
+    5.3: server do the text analyzing every day at 8:00am 
+        5.3.1: one day report
+        5.3.2: history report
