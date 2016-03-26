@@ -9,7 +9,7 @@ def index(request):
     return HttpResponse("<h2>Welcome to ebay weight extractor<\h2>")
 
 def readebay_goldriga(request):
-    url = "http://www.ebay.ph/sch/m.html?_nkw=&_armrs=1&_from=&_ssn=goldriga&_ipg=200&rt=nc"
+    url = "http://www.ebay.ph/sch/m.html?_nkw=&_armrs=1&_ipg=200&_from=&_ssn=goldriga&_sop=10"
     listInfo = getpagesource(url);
     jsonResult = simplejson.dumps(listInfo)
     return HttpResponse(jsonResult,content_type="application/json")
