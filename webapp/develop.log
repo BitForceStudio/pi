@@ -12,3 +12,12 @@
 3: send the feedback. like reply                                            |   O
     3.1: send back job status to twitter                                    |-| O
     3.2: send back job status to email                                      |-| O
+4: get ebay keywords                                                        |   OX
+    4.1: find out all amber which weight > 30 gram                          |-| X
+    4.2: check it once a day, send the list to me                           |-| X
+    4.3: form a user friendly html and send it to me via email.             |-| O
+    4.4: just send the new one                                              |-| O
+5: Twitter keywords subject report                                          |   O
+    5.1: get all (nearly) twitters included the keywords                    |-| O
+    5.2: topic summary                                                      |-| O
+    5.3: report summary once a day at about 9:30 pm.                        |-| O
