@@ -7,3 +7,14 @@
 >>chmod a+x /usr/bin/wkhtmltopdf.sh
 >>ln -s /usr/bin/wkhtmltopdf.sh /usr/local/bin/wkhtmltopdf
 >>wkhtmltopdf http://www.google.com output.pdf
+
+2: django, bootstrap, jinja
+
+3: run on background for develop
+
+screen was a good idea, just as:
+>>screen
+>>#do what every you want to do 
+>>ctrl a d
+>>screen -r   #to return to the current screen.
+
