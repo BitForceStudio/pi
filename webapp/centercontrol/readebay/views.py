@@ -122,11 +122,11 @@ def getpagesource(url):
                             exitem.save()
                             # record updated info
                             itemReport = analyzeItemPage(exitem.item_url,exitem.item_weight,exitem.item_price)
-                            httpReport = httpFormer(httpReport,itemReport,0)
+                            httpReport = httpFormer(httpReport,exitem.item_url,itemReport,0)
                     else:
                         createItem(int(item_id[0]),p_link[0],weight,item_time,item_price)
                         itemReport = analyzeItemPage(p_link[0],weight,item_price)
-                        httpReport = httpFormer(httpReport,itemReport,1)
+                        httpReport = httpFormer(httpReport,p_link[0],itemReport,1)
                         #img_list.append(p_imglink[1])
                         #url_list.append(p_link[0])
                         #wgt_list.append(weight)
@@ -147,13 +147,13 @@ def createItem(item_id,url,weight,timeleft,price):
     newitem.item_price = price
     newitem.save()
 
-def httpFormer(httpReport,itemReport,new):
+def httpFormer(httpReport,url,itemReport,new):
     #httpBody(httpReport,imgurl,title,tl,weight,price):
-    httpReport = httpBody(httpReport,itemReport['ITEMIMGURL'],
-                                     itemReport['ITEMTITLE'],
-                                     itemReport['ITEMTIMEL'],
-                                     itemReport['ITEMWEIGHT'],
-                                     itemReport['ITEMPRICE'])
+    httpReport = httpBody(httpReport,url,itemReport['ITEMIMGURL'],
+                                         itemReport['ITEMTITLE'],
+                                         itemReport['ITEMTIMEL'],
+                                         itemReport['ITEMWEIGHT'],
+                                         itemReport['ITEMPRICE'])
     return httpReport
 
 def analyzeItemPage(url,weight,price):
@@ -209,7 +209,7 @@ def httpHeader(httpReport):
         
     return httpReport+header
 
-def httpBody(httpReport,imgurl,title,tl,weight,price):
+def httpBody(httpReport,url,imgurl,title,tl,weight,price):
     pricepg = price/weight
     body = "<!-- report sections --> \n"
     body = body + "            <!-- in a loop --> \n"
@@ -222,7 +222,7 @@ def httpBody(httpReport,imgurl,title,tl,weight,price):
     body = body + " \n"
     body = body + "                    <div style=\"float:left; margin-top: 10px;margin-left:10px;\"> \n"
     body = body + "                        <!-- parameter --> \n"
-    body = body + "                        <p> Title: "+title+" </p> \n"
+    body = body + "                         <a href=\""+url+"\"><span> Title: "+title+"</span> </a> \n"
     body = body + "                        <p> Weight: "+str(weight)+"</p> \n"
     body = body + "                        <p> Price: "+str(price)+" -- "+str(pricepg*9.5)+"/g </p> \n"
     body = body + "                        <p> Time left: " + tl + " </p> \n"
