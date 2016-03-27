@@ -6,6 +6,12 @@
     1.5: save all tweet to the db                                           |-| O
     1.6: node red: get email                                                |-| O
     1.7: get email attached file                                            |-| O
+    1.8: center control design                                              |-| O
+    1.9: tweeter control commend design                                     |-| O
+        1.9.1: download url                                                 |-|-| O
+        1.9.2: get new ebay item and send it to me via email                |-|-| O
+        1.9.3: get all ebay item and sent them to me via email              |-|-| O
+        1.9.4: get ebay item from different salers                          |-|-| O
 2: put the remotedownload with the server:                                  |   OX
     2.1: call remote url saver from the django                              |-| X
     2.2: call remote reading file saver from the django                     |-| O
@@ -16,8 +22,10 @@
     4.1: find out all amber which weight > 30 gram                          |-| X
     4.2: check it once a day, send the list to me                           |-| X
     4.3: save all to the database. send the new item to me                  |-| X
-    4.4: form a user friendly html and send it to me via email.             |-| O
-    4.5: just send the new one                                              |-| O
+    4.4: form a user friendly html and send it to me via email.             |-| X
+    4.5: just send the new one                                              |-| X
+    4.6: store price increasing and its time                                |-| O
+    4.7: if ended, flag it, and make a report every week                    |-| O
 5: Twitter keywords subject report                                          |   O
     5.1: get all (nearly) twitters included the keywords                    |-| O
     5.2: topic summary                                                      |-| O
