@@ -15,8 +15,9 @@
 4: get ebay keywords                                                        |   OX
     4.1: find out all amber which weight > 30 gram                          |-| X
     4.2: check it once a day, send the list to me                           |-| X
-    4.3: form a user friendly html and send it to me via email.             |-| O
-    4.4: just send the new one                                              |-| O
+    4.3: save all to the database. send the new item to me                  |-| X
+    4.4: form a user friendly html and send it to me via email.             |-| O
+    4.5: just send the new one                                              |-| O
 5: Twitter keywords subject report                                          |   O
     5.1: get all (nearly) twitters included the keywords                    |-| O
     5.2: topic summary                                                      |-| O

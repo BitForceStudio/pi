@@ -1,0 +1,12 @@
+TimeLeft
+<span id="vi-cdown_timeLeft" class="tml tmlHt">
+												9d 18h </span>
+
+Bids
+<a href="http://offer.ebay.co.uk/ws/eBayISAPI.dll?ViewBids&item=162019362309&rt=nc&_trksid=p2047675.l2565" rel="nofollow" id="vi-VR-bid-lnk" class="vi-bidC"><span id="qty-test">0</span><span> bids</span></a>
+
+image url
+<img id="icImg" class="img img500" itemprop="image" src="http://i.ebayimg.com/00/s/MTIwMFgxNjAw/z/1d4AAOSwoudW9s6s/$_12.JPG" style="display:none;"
+
+Title
+<span id="vi-lkhdr-itmTitl" class="u-dspn">Antique Egg Yolk Butterscotch Natural Baltic Amber Necklace Rare</span>

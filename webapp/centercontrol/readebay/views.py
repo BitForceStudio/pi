@@ -26,17 +26,20 @@ def index(request):
 
 def readebay_goldriga(request):
     url = "http://www.ebay.co.uk/sch/m.html?_nkw=&_armrs=1&_from=&_ssn=goldriga&_ipg=200&_sop=10"
-    listInfo = getpagesource(url);
-    jsonResult = simplejson.dumps(listInfo)
-    return HttpResponse(jsonResult,content_type="application/json")
+    httpResponse = getpagesource(url);
+    #jsonResult = simplejson.dumps(listInfo)
+    return HttpResponse(httpResponse) #jsonResult,content_type="application/json")
 
 def getpagesource(url):
+    
+    httpReport = ""
+    httpReport = httpHeader(httpReport)
     # Try to trick the server using header
     header = {
             'Connection':'Keep-Alive',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.71 Safari/537.36'
             }
-
+    
     pattern_url   = "<h3 class=\"lvtitle\"><a href=(.*?)</h3>"
     pattern_title = "class=\"vip\" title=\"(.*?)\">"
     pattern_link = "\"(.*?)\"  class=\"vip\" title=\""
@@ -117,16 +120,23 @@ def getpagesource(url):
                         if exitem.item_price != item_price:
                             exitem.item_price = item_price
                             exitem.save()
+                            # record updated info
+                            itemReport = analyzeItemPage(exitem.item_url,exitem.item_weight,exitem.item_price)
+                            httpReport = httpFormer(httpReport,itemReport,0)
                     else:
                         createItem(int(item_id[0]),p_link[0],weight,item_time,item_price)
+                        itemReport = analyzeItemPage(p_link[0],weight,item_price)
+                        httpReport = httpFormer(httpReport,itemReport,1)
                         #img_list.append(p_imglink[1])
-                        url_list.append(p_link[0])
-                        wgt_list.append(weight)
+                        #url_list.append(p_link[0])
+                        #wgt_list.append(weight)
         
-        listall={#'IMGURL':img_list,
-                 'ITMURL':url_list,
-                 'WEIGHT':wgt_list}
-        return listall
+        #listall={#'IMGURL':img_list,
+        #         'ITMURL':url_list,
+        #         'WEIGHT':wgt_list}
+        
+        httpReport = httpFooter(httpReport)
+        return httpReport
     
 def createItem(item_id,url,weight,timeleft,price):
     newitem = Ebayitem()
@@ -136,3 +146,95 @@ def createItem(item_id,url,weight,timeleft,price):
     newitem.item_timeleft = timeleft
     newitem.item_price = price
     newitem.save()
+
+def httpFormer(httpReport,itemReport,new):
+    #httpBody(httpReport,imgurl,title,tl,weight,price):
+    httpReport = httpBody(httpReport,itemReport['ITEMIMGURL'],
+                                     itemReport['ITEMTITLE'],
+                                     itemReport['ITEMTIMEL'],
+                                     itemReport['ITEMWEIGHT'],
+                                     itemReport['ITEMPRICE'])
+    return httpReport
+
+def analyzeItemPage(url,weight,price):
+    header = {
+    'Connection':'Keep-Alive',
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.71 Safari/537.36'
+    }
+
+    pattern_timeleft   = "<span id=\"vi-cdown_timeLeft\" class=\"tml tmlHt\">(.*?)</span>"
+    pattern_imgurl     = "bigImage.src = '(.*?)';"
+    pattern_title      = "<span id=\"vi-lkhdr-itmTitl\" class=\"u-dspn\">(.*?)</span>"
+
+    req = Request(url,None,header)
+    reportList={'ITEMIMGURL':'',
+                'ITEMTITLE':'',
+                'ITEMWEIGHT':'',
+                'ITEMPRICE':'',
+                'ITEMTIMEL':''}
+    try:
+        response = urlopen(req,None,5)
+    except HTTPError,e:
+        if hasattr(e,'code'):
+            print 'The server cannot fuifill the request'
+            print 'Error Code:', e.code
+        elif hasattr(e,'reason'):
+            print 'We failed to reach a server'
+            print 'Reason',e.reason
+    else:
+        the_page = response.read()
+        p_timeleft = re.findall(pattern_timeleft,the_page, re.DOTALL)
+        p_imgurl = re.findall(pattern_imgurl,the_page, re.DOTALL)
+        p_title = re.findall(pattern_title,the_page,re.DOTALL)
+        timeleft = p_timeleft[0]
+        reportList={'ITEMIMGURL':p_imgurl[0],
+                    'ITEMTITLE':p_title[0],
+                    'ITEMWEIGHT':weight,
+                    'ITEMPRICE':price,
+                    'ITEMTIMEL':timeleft[14:]}
+    return reportList
+
+def httpHeader(httpReport):
+    header = "<!-- report header --> \n"
+    header = header + "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\"> \n"
+    header = header + "<html> \n"
+    header = header + "    <head> \n"
+    header = header + "        <meta charset=\"UTF-8\"> \n"
+    header = header + "        <title>Report</title> \n"
+    header = header + "        <link rel=\"stylesheet\" type=\"text/css\"> \n"
+    header = header + "    </head> \n"
+    header = header + "     \n"
+    header = header + "    <body> \n"
+    header = header + "        <main> \n"
+        
+    return httpReport+header
+
+def httpBody(httpReport,imgurl,title,tl,weight,price):
+    pricepg = price/weight
+    body = "<!-- report sections --> \n"
+    body = body + "            <!-- in a loop --> \n"
+    body = body + "            <div style=\"width:900px; height:220px; float:left; background-color: #e0e0e0;\"> \n"
+    body = body + "                <section style=\"display:inline; margin-top: 10px;\"> \n"
+    body = body + "                    <div style=\"width:auto; height:200px;float:left; margin-top: 10px;margin-left:10px;\"> \n"
+    body = body + "                        <!-- parameter --> \n"
+    body = body + "                        <img src=\""+imgurl+"\" style=\"height:200px;\"/> \n"
+    body = body + "                    </div> \n"
+    body = body + " \n"
+    body = body + "                    <div style=\"float:left; margin-top: 10px;margin-left:10px;\"> \n"
+    body = body + "                        <!-- parameter --> \n"
+    body = body + "                        <p> Title: "+title+" </p> \n"
+    body = body + "                        <p> Weight: "+str(weight)+"</p> \n"
+    body = body + "                        <p> Price: "+str(price)+" -- "+str(pricepg*9.5)+"/g </p> \n"
+    body = body + "                        <p> Time left: " + tl + " </p> \n"
+    body = body + "                    </div> \n"
+    body = body + "                </section> \n"
+    body = body + "            </div> \n"
+    body = body + " \n"
+    return httpReport+body
+    
+def httpFooter(httpReport):
+    footer = "<!-- report footer --> \n"
+    footer = footer + "        </main> \n"
+    footer = footer + "    </body> \n"
+    footer = footer + "</html> \n"
+    return httpReport+footer
