@@ -46,18 +46,11 @@ def getpagesource(url):
     pattern_grams = "Amber (.*?) Grams"
     pattern_necklace_gram = "Necklace (.*?) Grams"
     pattern_brooch_gram = "Brooch (.*?) Grams"
-    #pattern_imglink = "src=\"(.*?)\""
-    #pattern_img = "<img(.*?)class=\"img\" alt='Item image' />"
     pattern_id = "Grams-/(.*?)\?hash=item"
     
     pattern_price = "<li class=\"lvprice prc\">(.*?)</span>"
     pattern_money = "<span  class=\"bold\">(.*?)"
-    pattern_time  = "<span aria-label=\"Ending time: \" class=\"red\">(.*?)</span>"
     
-    # define the list
-    #img_list=[]
-    url_list=[]
-    wgt_list=[]
 
     req = Request(url,None,header)
     # try to connect to the server
@@ -71,19 +64,14 @@ def getpagesource(url):
     else:
         the_page = response.read()
         p_url = re.findall(pattern_url,the_page, re.DOTALL)
-#        p_img = re.findall(pattern_img,the_page, re.DOTALL)
         p_price = re.findall(pattern_price,the_page,re.DOTALL)
-        p_time  = re.findall(pattern_time,the_page,re.DOTALL)
         i=0
         weight=0.0
         for str in p_url:
             p_link  = re.findall(pattern_link,str,re.DOTALL)
             p_title = re.findall(pattern_title,str,re.DOTALL)
-#            str_img = p_img[i]
-#            p_imglink = re.findall(pattern_imglink,str_img,re.DOTALL)
             item_price_line = p_price[i]
             item_price = float(item_price_line[27:])
-            item_time = p_time[i]
             i=i+1
             for str1 in p_title:
                 weight = 0.0
@@ -118,22 +106,16 @@ def getpagesource(url):
                     if exist:
                         exitem = Ebayitem.objects.get(item_id__exact = int(item_id[0]))
                         if exitem.item_price != item_price:
-                            exitem.item_price = item_price
-                            exitem.save()
                             # record updated info
                             itemReport = analyzeItemPage(exitem.item_url,exitem.item_weight,exitem.item_price)
+                            exitem.item_price = item_price
+                            exitem.item_timeleft = itemReport['ITEMTIMEL']
+                            exitem.save()
                             httpReport = httpFormer(httpReport,exitem.item_url,itemReport,0)
                     else:
-                        createItem(int(item_id[0]),p_link[0],weight,item_time,item_price)
                         itemReport = analyzeItemPage(p_link[0],weight,item_price)
+                        createItem(int(item_id[0]),p_link[0],weight,itemReport['ITEMTIMEL'],item_price)
                         httpReport = httpFormer(httpReport,p_link[0],itemReport,1)
-                        #img_list.append(p_imglink[1])
-                        #url_list.append(p_link[0])
-                        #wgt_list.append(weight)
-        
-        #listall={#'IMGURL':img_list,
-        #         'ITMURL':url_list,
-        #         'WEIGHT':wgt_list}
         
         httpReport = httpFooter(httpReport)
         return httpReport
@@ -148,7 +130,6 @@ def createItem(item_id,url,weight,timeleft,price):
     newitem.save()
 
 def httpFormer(httpReport,url,itemReport,new):
-    #httpBody(httpReport,imgurl,title,tl,weight,price):
     httpReport = httpBody(httpReport,url,itemReport['ITEMIMGURL'],
                                          itemReport['ITEMTITLE'],
                                          itemReport['ITEMTIMEL'],
@@ -186,7 +167,10 @@ def analyzeItemPage(url,weight,price):
         p_timeleft = re.findall(pattern_timeleft,the_page, re.DOTALL)
         p_imgurl = re.findall(pattern_imgurl,the_page, re.DOTALL)
         p_title = re.findall(pattern_title,the_page,re.DOTALL)
-        timeleft = p_timeleft[0]
+        timeleft="01234567890123NOTIME"
+        if len(p_timeleft) != 0:
+            timeleft = p_timeleft[0]
+        
         reportList={'ITEMIMGURL':p_imgurl[0],
                     'ITEMTITLE':p_title[0],
                     'ITEMWEIGHT':weight,
