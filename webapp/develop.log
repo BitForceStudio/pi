@@ -26,6 +26,8 @@
     4.5: just send the new one                                              |-| X
     4.6: store price increasing and its time                                |-| O
     4.7: if ended, flag it, and make a report every week                    |-| O
+    4.8: read the url, pattern from file                                    |-| O
+    4.9: added more salers.                                                 |-| O
 5: Twitter keywords subject report                                          |   O
     5.1: get all (nearly) twitters included the keywords                    |-| O
     5.2: topic summary                                                      |-| O
