@@ -7,11 +7,9 @@ import re
 from urllib2 import Request,urlopen,URLError,HTTPError
 
 def index(request):
-    header = {
-            'Connection':'Keep-Alive',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.71 Safari/537.36'
-            }
-    url = "http://www.ebay.co.uk/itm/Antique-Natural-Baltic-Egg-Yolk-Butterscotch-Amber-74-3-Grams-/162016261125?hash=item25b8ebf405:g:BIQAAOSwQjNW8tOb"
+    # This mainly for test
+    header = fakeHttpHeader()
+    url = "http://www.ebay.co.uk/itm/Antique-Old-Natural-Baltic-Egg-Yolk-Butterscotch-Amber-Unique-/162020228630?hash=item25b9287e16:g:a7MAAOSwGYVW-Avu"
     req = Request(url,None,header)
     # try to connect to the server
     try:
@@ -35,10 +33,7 @@ def getpagesource(url):
     httpReport = ""
     httpReport = httpHeader(httpReport)
     # Try to trick the server using header
-    header = {
-            'Connection':'Keep-Alive',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.71 Safari/537.36'
-            }
+    header = fakeHttpHeader()
     
     pattern_url   = "<h3 class=\"lvtitle\"><a href=(.*?)</h3>"
     pattern_title = "class=\"vip\" title=\"(.*?)\">"
@@ -46,11 +41,10 @@ def getpagesource(url):
     pattern_grams = "Amber (.*?) Grams"
     pattern_necklace_gram = "Necklace (.*?) Grams"
     pattern_brooch_gram = "Brooch (.*?) Grams"
-    pattern_id = "Grams-/(.*?)\?hash=item"
+    pattern_id = "-/(.*?)\?hash=item"
     
     pattern_price = "<li class=\"lvprice prc\">(.*?)</span>"
     pattern_money = "<span  class=\"bold\">(.*?)"
-    
 
     req = Request(url,None,header)
     # try to connect to the server
@@ -74,13 +68,13 @@ def getpagesource(url):
             item_price = float(item_price_line[27:])
             i=i+1
             for str1 in p_title:
-                weight = 0.0
+                weight = -10.0
                 p_gram = re.findall(pattern_grams,str1)
                 item_id = re.findall(pattern_id,str)
                 try:
                     x = float(p_gram[0])
                 except:
-                    x=0.0
+                    weight=-10.0
                 else:
                     weight = x;
 
@@ -88,7 +82,7 @@ def getpagesource(url):
                 try:
                     x = float(p_gram[0])
                 except:
-                    x=0.0
+                    weight=-10.0
                 else:
                     weight = x
 
@@ -96,11 +90,11 @@ def getpagesource(url):
                 try:
                     x=float(p_gram[0])
                 except:
-                    x=0.0
+                    weight=-10.0
                 else:
                     weight = x
             
-                if weight>30.0:
+                if weight>30.0 or weight<0.0:
                     #save to the database:
                     exist = Ebayitem.objects.filter(item_id__exact = int(item_id[0]))
                     if exist:
@@ -114,9 +108,10 @@ def getpagesource(url):
                             httpReport = httpFormer(httpReport,exitem.item_url,itemReport,0)
                     else:
                         itemReport = analyzeItemPage(p_link[0],weight,item_price)
-                        createItem(int(item_id[0]),p_link[0],weight,itemReport['ITEMTIMEL'],item_price)
-                        httpReport = httpFormer(httpReport,p_link[0],itemReport,1)
-        
+                        if itemReport['ITEMWEIGHT']>30.0:
+                            createItem(int(item_id[0]),p_link[0],itemReport['ITEMWEIGHT'],itemReport['ITEMTIMEL'],item_price)
+                            httpReport = httpFormer(httpReport,p_link[0],itemReport,1)
+
         httpReport = httpFooter(httpReport)
         return httpReport
     
@@ -138,14 +133,12 @@ def httpFormer(httpReport,url,itemReport,new):
     return httpReport
 
 def analyzeItemPage(url,weight,price):
-    header = {
-    'Connection':'Keep-Alive',
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.71 Safari/537.36'
-    }
+    header = fakeHttpHeader()
 
     pattern_timeleft   = "<span id=\"vi-cdown_timeLeft\" class=\"tml tmlHt\">(.*?)</span>"
     pattern_imgurl     = "bigImage.src = '(.*?)';"
     pattern_title      = "<span id=\"vi-lkhdr-itmTitl\" class=\"u-dspn\">(.*?)</span>"
+    pattern_weight   = "Weight (.*?) Grams"
 
     req = Request(url,None,header)
     reportList={'ITEMIMGURL':'',
@@ -167,6 +160,14 @@ def analyzeItemPage(url,weight,price):
         p_timeleft = re.findall(pattern_timeleft,the_page, re.DOTALL)
         p_imgurl = re.findall(pattern_imgurl,the_page, re.DOTALL)
         p_title = re.findall(pattern_title,the_page,re.DOTALL)
+        p_weight = re.findall(pattern_weight,the_page)
+        if len(p_weight)>0 and weight <0.0:
+            try:
+                x = float(p_weight[0])
+            except:
+                weight = -10.0
+            else:
+                weight = x 
         timeleft="01234567890123NOTIME"
         if len(p_timeleft) != 0:
             timeleft = p_timeleft[0]
@@ -178,6 +179,18 @@ def analyzeItemPage(url,weight,price):
                     'ITEMTIMEL':timeleft[14:]}
     return reportList
 
+#-------------------------------------------------------------------------------------------------------------------------
+#                                                    Pattern file reader
+#-------------------------------------------------------------------------------------------------------------------------
+def testFileReader(filename):
+    return
+
+def patternFileReader(filename):
+    return
+
+#-------------------------------------------------------------------------------------------------------------------------
+#                                                    HTTP UTILITY
+#-------------------------------------------------------------------------------------------------------------------------
 def httpHeader(httpReport):
     header = "<!-- report header --> \n"
     header = header + "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\"> \n"
@@ -189,8 +202,7 @@ def httpHeader(httpReport):
     header = header + "    </head> \n"
     header = header + "     \n"
     header = header + "    <body> \n"
-    header = header + "        <main> \n"
-        
+    header = header + "        <main> \n"  
     return httpReport+header
 
 def httpBody(httpReport,url,imgurl,title,tl,weight,price):
@@ -222,3 +234,10 @@ def httpFooter(httpReport):
     footer = footer + "    </body> \n"
     footer = footer + "</html> \n"
     return httpReport+footer
+
+def fakeHttpHeader():
+    fheader = {
+            'Connection':'Keep-Alive',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.71 Safari/537.36'
+            }
+    return fheader
