@@ -25,8 +25,12 @@ def index(request):
 def readebay_goldriga(request):
     url = "http://www.ebay.co.uk/sch/m.html?_nkw=&_armrs=1&_from=&_ssn=goldriga&_ipg=200&_sop=10"
     httpResponse = getpagesource(url);
-    #jsonResult = simplejson.dumps(listInfo)
-    return HttpResponse(httpResponse) #jsonResult,content_type="application/json")
+    return HttpResponse(httpResponse)
+
+
+# ------------------------------------------------------------------------------------------------------------------------
+#            Private Functions
+#-------------------------------------------------------------------------------------------------------------------------
 
 def getpagesource(url):
     
@@ -38,13 +42,9 @@ def getpagesource(url):
     pattern_url   = "<h3 class=\"lvtitle\"><a href=(.*?)</h3>"
     pattern_title = "class=\"vip\" title=\"(.*?)\">"
     pattern_link = "\"(.*?)\"  class=\"vip\" title=\""
-    pattern_grams = "Amber (.*?) Grams"
-    pattern_necklace_gram = "Necklace (.*?) Grams"
-    pattern_brooch_gram = "Brooch (.*?) Grams"
     pattern_id = "-/(.*?)\?hash=item"
-    
+    pattern_float = "[+-]?[0-9.]+"
     pattern_price = "<li class=\"lvprice prc\">(.*?)</span>"
-    pattern_money = "<span  class=\"bold\">(.*?)"
 
     req = Request(url,None,header)
     # try to connect to the server
@@ -65,52 +65,43 @@ def getpagesource(url):
             p_link  = re.findall(pattern_link,str,re.DOTALL)
             p_title = re.findall(pattern_title,str,re.DOTALL)
             item_price_line = p_price[i]
-            item_price = float(item_price_line[27:])
+
+            try:
+                x = float(re.findall(pattern_float,item_price_line,re.DOTALL))
+            except:
+                return 'failed to convert/find price'
+            else:
+                item_price = x
+
+            weight = -10.0
+            p_gram = re.findall(pattern_float,p_title[0])
+            item_id = re.findall(pattern_id,str)
+            try:
+                x = float(p_gram[0])
+            except:
+                weight=-10.0
+            else:
+                weight = x;
+        
+            if weight>30.0 or weight<0.0:
+                #save to the database:
+                exist = Ebayitem.objects.filter(item_id__exact = int(item_id[0]))
+                if exist:
+                    exitem = Ebayitem.objects.get(item_id__exact = int(item_id[0]))
+                    if exitem.item_price != item_price:
+                        # record updated info
+                        itemReport = analyzeItemPage(exitem.item_url,exitem.item_weight,exitem.item_price)
+                        exitem.item_price = item_price
+                        exitem.item_timeleft = itemReport['ITEMTIMEL']
+                        exitem.save()
+                        httpReport = httpFormer(httpReport,exitem.item_url,itemReport,0)
+                else:
+                    itemReport = analyzeItemPage(p_link[0],weight,item_price)
+                    if itemReport['ITEMWEIGHT']>30.0:
+                        createItem(int(item_id[0]),p_link[0],itemReport['ITEMWEIGHT'],itemReport['ITEMTIMEL'],item_price)
+                        httpReport = httpFormer(httpReport,p_link[0],itemReport,1)
+
             i=i+1
-            for str1 in p_title:
-                weight = -10.0
-                p_gram = re.findall(pattern_grams,str1)
-                item_id = re.findall(pattern_id,str)
-                try:
-                    x = float(p_gram[0])
-                except:
-                    weight=-10.0
-                else:
-                    weight = x;
-
-                p_gram = re.findall(pattern_necklace_gram,str1)
-                try:
-                    x = float(p_gram[0])
-                except:
-                    weight=-10.0
-                else:
-                    weight = x
-
-                p_gram = re.findall(pattern_brooch_gram,str1)
-                try:
-                    x=float(p_gram[0])
-                except:
-                    weight=-10.0
-                else:
-                    weight = x
-            
-                if weight>30.0 or weight<0.0:
-                    #save to the database:
-                    exist = Ebayitem.objects.filter(item_id__exact = int(item_id[0]))
-                    if exist:
-                        exitem = Ebayitem.objects.get(item_id__exact = int(item_id[0]))
-                        if exitem.item_price != item_price:
-                            # record updated info
-                            itemReport = analyzeItemPage(exitem.item_url,exitem.item_weight,exitem.item_price)
-                            exitem.item_price = item_price
-                            exitem.item_timeleft = itemReport['ITEMTIMEL']
-                            exitem.save()
-                            httpReport = httpFormer(httpReport,exitem.item_url,itemReport,0)
-                    else:
-                        itemReport = analyzeItemPage(p_link[0],weight,item_price)
-                        if itemReport['ITEMWEIGHT']>30.0:
-                            createItem(int(item_id[0]),p_link[0],itemReport['ITEMWEIGHT'],itemReport['ITEMTIMEL'],item_price)
-                            httpReport = httpFormer(httpReport,p_link[0],itemReport,1)
 
         httpReport = httpFooter(httpReport)
         return httpReport
@@ -183,9 +174,42 @@ def analyzeItemPage(url,weight,price):
 #                                                    Pattern file reader
 #-------------------------------------------------------------------------------------------------------------------------
 def testFileReader(filename):
+    try:
+        with open(filename,"r") as urls:
+            for line in urls:
+                #remove \n
+                i = line.find("\n")
+                fname = "temp"
+                if i>0:
+                    line = line[0:i]
+                else:
+                    continue
+                # read line and find out the command
+                llen = len(line)
+                url = ''
+                pattern = ''
+
+                # get url and specific pattern
+                if llen>4 and line[0:3]=="URL":
+                    url = line[4:llen]
+                elif llen>8  and line[0:7] == "PATTERN":
+                    # read pattern and save it to pattern with the key: PATTERN <h3 class=\"lvtitle\"><a href=(.*?)</h3> -----> URL
+                    position = line.find("----->")
+                    rex = line[8:position-1]
+                    key = line[position+7:llen]
+                    pattern.append([key:rex])
+    except IOError:
+        print "Fail to read file "+ filename
+        return
     return
 
 def patternFileReader(filename):
+    #pattern_url   = "<h3 class=\"lvtitle\"><a href=(.*?)</h3>"
+    #pattern_title = "class=\"vip\" title=\"(.*?)\">"
+    #pattern_link = "\"(.*?)\"  class=\"vip\" title=\""
+    #pattern_id = "-/(.*?)\?hash=item"
+    #pattern_float = "[+-]?[0-9.]+"
+    #pattern_price = "<li class=\"lvprice prc\">(.*?)</span>"
     return
 
 #-------------------------------------------------------------------------------------------------------------------------
