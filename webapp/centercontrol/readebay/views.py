@@ -67,9 +67,10 @@ def getpagesource(url):
             item_price_line = p_price[i]
 
             try:
-                x = float(re.findall(pattern_float,item_price_line,re.DOTALL))
+                tx = re.findall(pattern_float,item_price_line,re.DOTALL)
+                x = float(tx[0])
             except:
-                return 'failed to convert/find price'
+                item_price = -10
             else:
                 item_price = x
 
@@ -98,7 +99,7 @@ def getpagesource(url):
                 else:
                     itemReport = analyzeItemPage(p_link[0],weight,item_price)
                     if itemReport['ITEMWEIGHT']>30.0:
-                        createItem(int(item_id[0]),p_link[0],itemReport['ITEMWEIGHT'],itemReport['ITEMTIMEL'],item_price)
+                        createItem(int(item_id[0]),p_link[0],itemReport['ITEMWEIGHT'],itemReport['ITEMTIMEL'],itemReport['ITEMPRICE'])
                         httpReport = httpFormer(httpReport,p_link[0],itemReport,1)
 
             i=i+1
@@ -130,6 +131,7 @@ def analyzeItemPage(url,weight,price):
     pattern_imgurl     = "bigImage.src = '(.*?)';"
     pattern_title      = "<span id=\"vi-lkhdr-itmTitl\" class=\"u-dspn\">(.*?)</span>"
     pattern_weight   = "Weight (.*?) Grams"
+    pattern_price    = "<span id=\"convbidPrice\" style=\"white-space: nowrap;font-weight:bold;\">(.*?)<span>(including postage)"
 
     req = Request(url,None,header)
     reportList={'ITEMIMGURL':'',
@@ -146,12 +148,39 @@ def analyzeItemPage(url,weight,price):
         elif hasattr(e,'reason'):
             print 'We failed to reach a server'
             print 'Reason',e.reason
+        return reportList
     else:
         the_page = response.read()
         p_timeleft = re.findall(pattern_timeleft,the_page, re.DOTALL)
         p_imgurl = re.findall(pattern_imgurl,the_page, re.DOTALL)
         p_title = re.findall(pattern_title,the_page,re.DOTALL)
         p_weight = re.findall(pattern_weight,the_page)
+        tprice = 0.0
+        try: 
+            x = float(price)
+        except:
+            p_price = re.findall(pattern_price,the_page)
+            tp = p_price[0]
+            try:
+                x = float(tp[1:])
+            except:
+                tprice = -100
+            else:
+                tprice = x
+        else:
+            if price<0:
+                p_price = re.findall(pattern_price,the_page)
+                tp = p_price[0]
+                try:
+                    x = float(tp[1:])
+                except:
+                    tprice = -100
+                else:
+                    tprice = x
+            else:
+                tprice = price
+        price = tprice
+
         if len(p_weight)>0 and weight <0.0:
             try:
                 x = float(p_weight[0])
@@ -197,7 +226,7 @@ def testFileReader(filename):
                     position = line.find("----->")
                     rex = line[8:position-1]
                     key = line[position+7:llen]
-                    pattern.append([key:rex])
+                    #pattern.append([key:rex])
     except IOError:
         print "Fail to read file "+ filename
         return
