@@ -27,6 +27,16 @@ def readebay_goldriga(request):
     httpResponse = getpagesource(url);
     return HttpResponse(httpResponse)
 
+def readebay_organicwear(request):
+    url = "http://www.ebay.co.uk/sch/m.html?_nkw=&_armrs=1&_ipg=200&_from=&_ssn=organicwear&_sop=1"
+    httpReport = getpagesource(url); #WEIGHT : 62.37gr.
+    return HttpResponse(httpResponse)
+
+def readebay_katren2002(request):
+    url = "http://www.ebay.co.uk/sch/Amber-/10191/m.html?_nkw=&_armrs=1&_ipg=200&_from=&_ssn=katren2002&_sop=1"
+    httpReport = getpagesource(url); #WEIGHT : 738 gr.
+    return HttpResponse(httpResponse)
+    
 
 # ------------------------------------------------------------------------------------------------------------------------
 #            Private Functions
@@ -127,9 +137,9 @@ def httpFormer(httpReport,url,itemReport,new):
 def analyzeItemPage(url,weight,price):
     header = fakeHttpHeader()
 
-    pattern_timeleft   = "<span id=\"vi-cdown_timeLeft\" class=\"tml tmlHt\">(.*?)</span>"
-    pattern_imgurl     = "bigImage.src = '(.*?)';"
-    pattern_title      = "<span id=\"vi-lkhdr-itmTitl\" class=\"u-dspn\">(.*?)</span>"
+    pattern_timeleft = "<span id=\"vi-cdown_timeLeft\" class=\"tml tmlHt\">(.*?)</span>"
+    pattern_imgurl   = "bigImage.src = '(.*?)';"
+    pattern_title    = "<span id=\"vi-lkhdr-itmTitl\" class=\"u-dspn\">(.*?)</span>"
     pattern_weight   = "Weight (.*?) Grams"
     pattern_price    = "<span id=\"convbidPrice\" style=\"white-space: nowrap;font-weight:bold;\">(.*?)<span>(including postage)"
 
@@ -150,11 +160,11 @@ def analyzeItemPage(url,weight,price):
             print 'Reason',e.reason
         return reportList
     else:
-        the_page = response.read()
+        the_page   = response.read()
         p_timeleft = re.findall(pattern_timeleft,the_page, re.DOTALL)
-        p_imgurl = re.findall(pattern_imgurl,the_page, re.DOTALL)
-        p_title = re.findall(pattern_title,the_page,re.DOTALL)
-        p_weight = re.findall(pattern_weight,the_page)
+        p_imgurl   = re.findall(pattern_imgurl,the_page, re.DOTALL)
+        p_title    = re.findall(pattern_title,the_page,re.DOTALL)
+        p_weight   = re.findall(pattern_weight,the_page)
         tprice = 0.0
         try: 
             x = float(price)
