@@ -31,6 +31,7 @@
     4.7: if ended, flag it, and make a report every week                    |-| O
     4.8: read the url, pattern from file                                    |-| O
     4.9: added more salers.                                                 |-| O
+    4.10: add a key word "Press/Pressed" for amber                          |-| O
 5: Twitter keywords subject report                                          |   O
     5.1: get all (nearly) twitters included the keywords                    |-| O
     5.2: topic summary                                                      |-| O
