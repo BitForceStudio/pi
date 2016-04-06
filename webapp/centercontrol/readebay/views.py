@@ -36,6 +36,11 @@ def readebay_katren2002(request):
     url = "http://www.ebay.co.uk/sch/Amber-/10191/m.html?_nkw=&_armrs=1&_ipg=200&_from=&_ssn=katren2002&_sop=1"
     httpReport = getpagesource(url); #WEIGHT : 738 gr.
     return HttpResponse(httpResponse)
+
+def readebay_ambergalleryboutique1(request): # dominijia republic
+    url = "http://www.ebay.co.uk/sch/m.html?_nkw=&_armrs=1&_ipg=200&_from=&_ssn=ambergalleryboutique1&_sop=10"
+    httpReport = getpagesource(url)
+    return HttpResponse(httpReport)
     
 
 # ------------------------------------------------------------------------------------------------------------------------
