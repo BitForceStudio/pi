@@ -2,8 +2,8 @@ import RPi.GPIO as GPIO
 import time
 
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(21, GPIO.OUT)
-pwm = GPIO.PWM(21, 100)
+GPIO.setup(5, GPIO.OUT)
+pwm = GPIO.PWM(5, 100)
 pwm.start(5)
 
 
