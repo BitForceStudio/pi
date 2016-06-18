@@ -1,0 +1,11 @@
+Hardware: Pi zero, motozero, 4 wheels car
+
+left wheels : motor 2,   Enable: 17
+                       Positive: 6
+                        Negtive: 22
+
+right wheels: motor 3,   Enable: 12
+                       Positive: 23
+                        Negtive: 16
+
+
