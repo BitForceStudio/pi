@@ -18,6 +18,7 @@ Hardware: Pi zero, motozero, 4 wheels car
     http://blog.gbaman.info/?p=150
 
 4: web interface control
+    using django chat room structure
 
 5: jessie lite kernel on pi zero
 

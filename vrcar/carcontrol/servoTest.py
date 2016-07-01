@@ -38,7 +38,7 @@ def readkey(getchar_fn=None):
 # End of single character reading
 #======================================================================
 
-speed = 60
+speed = 100
 
 print "Tests the servos by using the arrow keys to control"
 print "Press <space> key to centre"
@@ -67,25 +67,26 @@ pz.setOutput (grip, gripVal)
 
 # main loop
 try:
+    step=2
     while True:
         keyp = readkey()
         if keyp == 'w' or ord(keyp) == 16:
-            panVal = max (65, panVal - 5)
+            panVal = max (65, panVal - step)
             print 'Up', panVal
         elif keyp == 'z' or ord(keyp) == 17:
-            panVal = min (160, panVal + 5)
+            panVal = min (160, panVal + step)
             print 'Down', panVal
         elif keyp == 's' or ord(keyp) == 18:
-            tiltVal = max (20, tiltVal - 5)
+            tiltVal = max (20, tiltVal - step)
             print 'Right', tiltVal
         elif keyp == 'a' or ord(keyp) == 19:
-            tiltVal = min (160, tiltVal + 5)
+            tiltVal = min (160, tiltVal + step)
             print 'Left', tiltVal
         elif keyp == 'g':
-            gripVal = max (20, gripVal - 5)
+            gripVal = max (20, gripVal - step)
             print 'Open', gripVal
         elif keyp == 'h':
-            gripVal = min (160, gripVal + 5)
+            gripVal = min (160, gripVal + step)
             print 'Close', gripVal
         elif keyp == ' ':
             panVal = tiltVal = gripVal = 90
