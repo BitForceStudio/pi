@@ -1,0 +1,68 @@
+{% extends "realtimecontrol/header.html" %}
+
+{% block content %}
+{% load staticfiles %}
+<form id="control">
+	<div class="row">
+		<div class="col-xs-4 col-sm-4 col-lg-4">
+	    </div>
+	    <div class="col-xs-4 col-sm-4 col-lg-4">
+	        <button class="btn btn-default" type="submit" id="up">UP</button>
+	    </div>
+	    <div class="col-xs-4 col-sm-4 col-lg-4">
+	    </div>
+
+
+	    <div class="col-xs-4 col-sm-4 col-lg-4">
+	    	<button class="btn btn-default" type="submit" id="left">LEFT</button>
+	    </div>
+	    <div class="col-xs-4 col-sm-4 col-lg-4">
+	    </div>
+	    <div class="col-xs-4 col-sm-4 col-lg-4">
+	    	<button class="btn btn-default" type="submit" id="right">RIGHT</button>
+	    </div>
+
+	    <div class="col-xs-4 col-sm-4 col-lg-4">
+	    </div>
+	    <div class="col-xs-4 col-sm-4 col-lg-4">
+	    	<button class="btn btn-default" type="submit" id="down">DOWN</button>
+	    </div>
+	    <div class="col-xs-4 col-sm-4 col-lg-4">
+	    </div>
+	</div>
+	<hr>
+		<div class="row">
+		<div class="col-xs-4 col-sm-4 col-lg-4">
+	    </div>
+	    <div class="col-xs-4 col-sm-4 col-lg-4">
+	        <button class="btn btn-default" type="submit" id="foreward">FOREWARD</button>
+	    </div>
+	    <div class="col-xs-4 col-sm-4 col-lg-4">
+	    </div>
+
+
+	    <div class="col-xs-4 col-sm-4 col-lg-4">
+	    	<button class="btn btn-default" type="submit" id="left">LEFT</button>
+	    </div>
+	    <div class="col-xs-4 col-sm-4 col-lg-4">
+	    </div>
+	    <div class="col-xs-4 col-sm-4 col-lg-4">
+	    	<button class="btn btn-default" type="submit" id="right">RIGHT</button>
+	    </div>
+
+	    <div class="col-xs-4 col-sm-4 col-lg-4">
+	    </div>
+	    <div class="col-xs-4 col-sm-4 col-lg-4">
+	    	<button class="btn btn-default" type="submit" id="backward">BACKWARD</button>
+	    </div>
+	    <div class="col-xs-4 col-sm-4 col-lg-4">
+	    </div>
+	</div>
+</form>
+{% endblock %}
+
+{% block afterbody %}
+    <script type="text/javascript" src='{% static "js/jquery-1.12.1.min.js" %}'></script>
+    <script type="text/javascript" src='{% static "js/reconnecting-websocket.min.js" %}'></script>
+    <script type="text/javascript" src='{% static "js/control.js" %}'></script>
+{% endblock afterbody %}

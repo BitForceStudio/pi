@@ -10,17 +10,8 @@ import string
 import hashlib
 
 def about(request):
-    return render(request, "chatroom/about.html")
+    return render(request, "realtimecontrol/about.html")
 
-def new_room(request):
-    """
-    Randomly create a new room, and redirect to it.
-    """
-    new_room = None
-    while not new_room:
-        with transaction.atomic():
-            label = haikunator.haikunate()
-            if Room.objects.filter(label=label).exists():
-                continue
-            new_room = Room.objects.create(label=label)
-    return redirect(chat_room, label=label)
+def control(request):
+    return render(request, "realtimecontrol/base.html")
+    
