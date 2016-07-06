@@ -14,4 +14,4 @@ def about(request):
 
 def control(request):
     return render(request, "realtimecontrol/base.html")
-    
+

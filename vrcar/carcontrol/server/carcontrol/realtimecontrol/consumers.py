@@ -13,6 +13,7 @@ def ws_connect(message):
     # form /chatroom/{label}/, and finds a Room if the message path is applicable,
     # and if the Room exists. Otherwise, bails (meaning this is a some othersort
     # of websocket). So, this is effectively a version of _get_object_or_404.
+    log.debug('Here I am')
     try:
         chat, prefix, label = message['path'].decode('ascii').strip('/').split('/')
         if prefix != 'chatroom':
