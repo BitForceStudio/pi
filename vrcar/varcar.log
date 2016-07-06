@@ -1,0 +1,24 @@
+Hardware: Pi zero, motozero, 4 wheels car
+
+1: GPIO setting:
+    left wheels : motor 2,   Enable:   17
+                             Positive: 6
+                             Negtive:  22
+
+    right wheels: motor 3,   Enable:   12
+                             Positive: 23
+                             Negtive:  16
+
+2: Install Gstreamer:
+    the official one didn't work on my pi zero, so use the following:
+    sudo apt-get install gstreamer1.0-tools
+
+3: Stream videos to the mac:
+    follow the intro:
+    http://blog.gbaman.info/?p=150
+
+4: web interface control
+    using django chat room structure
+
+5: jessie lite kernel on pi zero
+
