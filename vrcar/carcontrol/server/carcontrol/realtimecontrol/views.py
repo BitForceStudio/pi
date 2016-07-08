@@ -12,6 +12,8 @@ import hashlib
 def about(request):
     return render(request, "realtimecontrol/about.html")
 
-def control(request):
-    return render(request, "realtimecontrol/base.html")
+def control(request,label):
+    args={}
+    args['label']=123123123123123
+    return render(request, "realtimecontrol/base.html",args)
 
