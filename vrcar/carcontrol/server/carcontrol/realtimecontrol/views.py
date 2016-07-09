@@ -12,8 +12,18 @@ import hashlib
 def about(request):
     return render(request, "realtimecontrol/about.html")
 
+def dircontrol(request):
+    label = "remotecarcontrol"
+
+    newcontrol,created = Room.objects.get_or_create(label=label)
+    if created or newcontrol.name=="" :
+    	newcontrol.name=label
+    	newcontrol.save()
+
+    return redirect(control,label=label)
+
 def control(request,label):
     args={}
-    args['label']=123123123123123
+    args['label']="remotecarcontrol"
     return render(request, "realtimecontrol/base.html",args)
 

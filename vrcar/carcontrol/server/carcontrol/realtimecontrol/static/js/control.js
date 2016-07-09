@@ -15,7 +15,6 @@ $(function() {
         var commend=this.id;
         mouseStillDown=true;
         mouseDownCommend(commend)
-        //chatsock.send(str(commend));
 
         return false;
     });
@@ -27,7 +26,7 @@ $(function() {
     function mouseDownCommend(commend)
     { 
         document.getElementById("showmessage").value+=(commend);
-        chatsock.send(str(commend));
+        chatsock.send(commend);
         if (mouseStillDown)
         {
             setTimeout(function(){
