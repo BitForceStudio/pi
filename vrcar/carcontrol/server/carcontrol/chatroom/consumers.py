@@ -15,7 +15,7 @@ speed = 100
 # Define which pins are the servos
 pan = 0
 tilt = 1
-
+step = 5
 pz.init()
 
 # Set output mode to Servo
@@ -152,6 +152,7 @@ def ws_disconnect(message):
         pass
 
 def moveforward():
+    global pz,speed
     try:
         pz.forward(speed)
         time.sleep(0.1)
@@ -160,6 +161,7 @@ def moveforward():
         print "quit"
 
 def movebackward():
+    global pz,speed
     try:
         pz.reverse(speed)
         time.sleep(0.1)
@@ -168,6 +170,7 @@ def movebackward():
         print "quit"
 
 def moverightturn():
+    global pz,speed
     try:
         pz.spinRight(speed)
         time.sleep(0.1)
@@ -176,6 +179,7 @@ def moverightturn():
         print "quit"
 
 def moveleftturn():
+    global pz,speed
     try:
         pz.spinLeft(speed)
         time.sleep(0.1)
@@ -184,20 +188,23 @@ def moveleftturn():
         print "quit"
 
 def moveup():
+    global panVal,step,pz,pan
     try:
-        panVal = max (65, panVal - step)
+        panVal = max (65, panVal + step)
         pz.setOutput (pan, panVal)
     except KeyboardInterrupt:
         print "quit"
 
 def movedown():
+    global panVal,step,pz,pan
     try:
-        panVal = min (160, panVal + step)
+        panVal = min (160, panVal - step)
         pz.setOutput (pan, panVal)
     except KeyboardInterrupt:
         print "quit"
 
 def moveright():
+    global tiltVal,step,pz,tilt
     try:
         tiltVal = max (20, tiltVal - step)
         pz.setOutput (tilt, tiltVal)
@@ -205,6 +212,7 @@ def moveright():
         print "quit"
 
 def moveleft():
+    global tiltVal,step,pz,tilt
     try:
         tiltVal = min (160, tiltVal + step)
         pz.setOutput (tilt, tiltVal)
