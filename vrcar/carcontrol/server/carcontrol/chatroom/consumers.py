@@ -5,6 +5,30 @@ from channels import Group
 from channels.sessions import channel_session
 from .models import Room
 
+import piconzero as pz, time
+
+#======================================================================
+# Reading single character by forcing stdin to raw mode
+import sys,tty,termios
+
+speed = 100
+# Define which pins are the servos
+pan = 0
+tilt = 1
+
+pz.init()
+
+# Set output mode to Servo
+pz.setOutputConfig(pan, 2)
+pz.setOutputConfig(tilt, 2)
+
+# Centre all servos
+panVal = 90
+tiltVal = 90
+
+pz.setOutput (pan, panVal)
+pz.setOutput (tilt, tiltVal)
+
 log = logging.getLogger(__name__)
 
 @channel_session
@@ -69,7 +93,30 @@ def ws_receive(message):
             log.debug('chat message room=%s commend=%s', 
                 room.label, data)
             #m = room.messages.create(**data)
-
+            if data=="up":
+                log.debug("servo up")
+                moveup()
+            elif data=="down":
+                log.debug("servo up")
+                movedown()
+            elif data=="left":
+                log.debug("servo up")
+                moveleft()
+            elif data=="right":
+                log.debug("servo up")
+                moveright()
+            elif data=="forward":
+                log.debug("servo up")
+                moveforward()
+            elif data=="backward":
+                log.debug("servo up")
+                movebackward()
+            elif data=="leftturn":
+                log.debug("servo up")
+                moveleftturn()
+            elif data=="rightturn":
+                log.debug("servo up")
+                moverightturn()
             # See above for the note about Group
             Group('control-'+label, channel_layer=message.channel_layer).send({'text': data})
     else:
@@ -96,7 +143,73 @@ def ws_disconnect(message):
     try:
         label = message.channel_session['room']
         room = Room.objects.get(label=label)
-        Group('chat-'+label, channel_layer=message.channel_layer).discard(message.reply_channel)
+        if room.label=="remotecarcontrol":
+            pz.cleanup()
+            Group('control-'+label, channel_layer=message.channel_layer).discard(message.reply_channel)
+        else:
+            Group('chat-'+label, channel_layer=message.channel_layer).discard(message.reply_channel)
     except (KeyError, Room.DoesNotExist):
         pass
+
+def moveforward():
+    try:
+        pz.forward(speed)
+        time.sleep(0.1)
+        pz.stop()
+    except KeyboardInterrupt:
+        print "quit"
+
+def movebackward():
+    try:
+        pz.reverse(speed)
+        time.sleep(0.1)
+        pz.stop()
+    except KeyboardInterrupt:
+        print "quit"
+
+def moverightturn():
+    try:
+        pz.spinRight(speed)
+        time.sleep(0.1)
+        pz.stop()
+    except KeyboardInterrupt:
+        print "quit"
+
+def moveleftturn():
+    try:
+        pz.spinLeft(speed)
+        time.sleep(0.1)
+        pz.stop()
+    except KeyboardInterrupt:
+        print "quit"
+
+def moveup():
+    try:
+        panVal = max (65, panVal - step)
+        pz.setOutput (pan, panVal)
+    except KeyboardInterrupt:
+        print "quit"
+
+def movedown():
+    try:
+        panVal = min (160, panVal + step)
+        pz.setOutput (pan, panVal)
+    except KeyboardInterrupt:
+        print "quit"
+
+def moveright():
+    try:
+        tiltVal = max (20, tiltVal - step)
+        pz.setOutput (tilt, tiltVal)
+    except KeyboardInterrupt:
+        print "quit"
+
+def moveleft():
+    try:
+        tiltVal = min (160, tiltVal + step)
+        pz.setOutput (tilt, tiltVal)
+    except KeyboardInterrupt:
+        print "quit"
+
+
 
