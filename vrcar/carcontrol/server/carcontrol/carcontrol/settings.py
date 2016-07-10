@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'channels',
+    'chatroom',
     'realtimecontrol',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -129,7 +130,7 @@ CHANNEL_LAYERS = {
         "CONFIG": {
             "hosts": [os.environ.get('REDIS_URL', 'redis://localhost:6379')],
         },
-        "ROUTING": "realtimecontrol.routing.channel_routing",
+        "ROUTING": "chatroom.routing.channel_routing",
     },
 }
 

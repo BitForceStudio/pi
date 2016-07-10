@@ -1,0 +1,72 @@
+{% extends "realtimecontrol/header.html" %}
+
+{% block content %}
+{% load staticfiles %}
+<form id="control">
+	<div class="row">
+		<div class="col-xs-4 col-sm-4 col-lg-4">
+	    </div>
+	    <div class="col-xs-4 col-sm-4 col-lg-4">
+	        <button class="btn btn-default" type="button" id="up" >UP</button>
+	    </div>
+	    <div class="col-xs-4 col-sm-4 col-lg-4">
+	    </div>
+	</div>
+	<div class="row">
+	    <div class="col-xs-4 col-sm-4 col-lg-4">
+	    	<button class="btn btn-default" type="button" id="left">LEFT</button>
+	    </div>
+	    <div class="col-xs-4 col-sm-4 col-lg-4">
+	    </div>
+	    <div class="col-xs-4 col-sm-4 col-lg-4">
+	    	<button class="btn btn-default" type="button" id="right">RIGHT</button>
+	    </div>
+	</div>
+	<div class="row">
+	    <div class="col-xs-4 col-sm-4 col-lg-4">
+	    </div>
+	    <div class="col-xs-4 col-sm-4 col-lg-4">
+	    	<button class="btn btn-default" type="button" id="down">DOWN</button>
+	    </div>
+	    <div class="col-xs-4 col-sm-4 col-lg-4">
+	    </div>
+	</div>
+	<hr>
+	<div class="row">
+		<div class="col-xs-4 col-sm-4 col-lg-4">
+	    </div>
+	    <div class="col-xs-4 col-sm-4 col-lg-4">
+	        <button class="btn btn-default" type="button" id="foreward">FOREWARD</button>
+	    </div>
+	    <div class="col-xs-4 col-sm-4 col-lg-4">
+	    </div>
+	</div>
+	<div class="row">
+	    <div class="col-xs-4 col-sm-4 col-lg-4">
+	    	<button class="btn btn-default" type="button" id="left">LEFT</button>
+	    </div>
+	    <div class="col-xs-4 col-sm-4 col-lg-4">
+	    </div>
+	    <div class="col-xs-4 col-sm-4 col-lg-4">
+	    	<button class="btn btn-default" type="button" id="right">RIGHT</button>
+	    </div>
+    </div>
+	<div class="row">
+	    <div class="col-xs-4 col-sm-4 col-lg-4">
+	    </div>
+	    <div class="col-xs-4 col-sm-4 col-lg-4">
+	    	<button class="btn btn-default" type="button" id="backward">BACKWARD</button>
+	    </div>
+	    <div class="col-xs-4 col-sm-4 col-lg-4">
+	    </div>
+	</div>
+
+	<textarea id="showmessage" ></textarea>
+</form>
+{% endblock %}
+
+{% block afterbody %}
+    <script type="text/javascript" src='{% static "jquery-1.12.1.min.js" %}'></script>
+    <script type="text/javascript" src='{% static "reconnecting-websocket.min.js" %}'></script>
+    <script type="text/javascript" src='{% static "control.js" %}'></script>
+{% endblock afterbody %}
