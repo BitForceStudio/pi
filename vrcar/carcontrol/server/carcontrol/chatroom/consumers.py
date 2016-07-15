@@ -151,10 +151,29 @@ def ws_disconnect(message):
     except (KeyError, Room.DoesNotExist):
         pass
 
-def moveforward():
+def moverightturn():
     global pz,speed
     try:
         pz.forward(speed)
+        time.sleep(0.05)
+	pz.spinRight(speed)
+	time.sleep(0.05)
+	pz.forward(speed)
+	time.sleep(0.05)
+        pz.stop()
+    except KeyboardInterrupt:
+        print "quit"
+
+def moveleftturn():
+    global pz,speed
+    try:
+        pz.reverse(speed)
+        time.sleep(0.05)
+        pz.spinLeft(speed)
+        time.sleep(0.05)
+        pz.reverse(speed)
+        time.sleep(0.05)
+        pz.spinLeft(speed)
         time.sleep(0.1)
         pz.stop()
     except KeyboardInterrupt:
@@ -163,22 +182,13 @@ def moveforward():
 def movebackward():
     global pz,speed
     try:
-        pz.reverse(speed)
-        time.sleep(0.1)
-        pz.stop()
-    except KeyboardInterrupt:
-        print "quit"
-
-def moverightturn():
-    global pz,speed
-    try:
         pz.spinRight(speed)
-        time.sleep(0.1)
+        time.sleep(0.05)
         pz.stop()
     except KeyboardInterrupt:
         print "quit"
 
-def moveleftturn():
+def moveforward():
     global pz,speed
     try:
         pz.spinLeft(speed)
