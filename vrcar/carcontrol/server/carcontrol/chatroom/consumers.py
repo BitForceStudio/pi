@@ -83,12 +83,20 @@ def ws_receive(message):
     # conform to the expected message format.
     if room.label=="remotecarcontrol":
         log.debug('car control mode')
+        data=''
         try:
-            data = message['text']
+            #data = message['text']
+            data = json.loads(message['text'])
         except ValueError:
             log.debug("ws message isn't json text=%s", data)
             return
-        log.debug("ws message isn't json text=%s", data)
+        log.debug("ws message is json text=%s", data)
+
+        movex(data['x'])
+        movey(data['y'])
+
+        log.debug("move x:%d  y:%d", data['x'],data['y'])
+
         if data:
             log.debug('chat message room=%s commend=%s', 
                 room.label, data)
@@ -228,6 +236,26 @@ def moveleft():
         pz.setOutput (tilt, tiltVal)
     except KeyboardInterrupt:
         print "quit"
+
+def movex(x):
+    global panVal,pz,pan
+    try:
+        panVal = min (160, x)
+        panVal = max (65, x)
+        pz.setOutput (pan, panVal)
+    except KeyboardInterrupt:
+        print "quit"
+
+
+def movey(y):
+    global tiltVal,pz,tilt
+    try:
+        tiltVal = max (20, y)
+        tiltVal = min (160, y)
+        pz.setOutput (tilt, tiltVal)
+    except KeyboardInterrupt:
+        print "quit"
+
 
 
 
