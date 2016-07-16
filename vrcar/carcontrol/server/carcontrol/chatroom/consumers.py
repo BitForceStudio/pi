@@ -240,8 +240,8 @@ def moveleft():
 def movex(x):
     global panVal,pz,pan
     try:
-        panVal = min (160, x)
-        panVal = max (65, x)
+        panVal = min (120, panVal+x)
+        panVal = max (60,  panVal+x)
         pz.setOutput (pan, panVal)
     except KeyboardInterrupt:
         print "quit"
@@ -250,8 +250,8 @@ def movex(x):
 def movey(y):
     global tiltVal,pz,tilt
     try:
-        tiltVal = max (20, y)
-        tiltVal = min (160, y)
+        tiltVal = max (80, y)
+        tiltVal = min (120, y)
         pz.setOutput (tilt, tiltVal)
     except KeyboardInterrupt:
         print "quit"

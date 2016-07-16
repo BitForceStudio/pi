@@ -43,22 +43,52 @@ $(function() {
             beta = event.beta,
             gamma = event.gamma);
 
+      formalalpha=a.innerHTML;
+      formalbeta=b.innerHTML;
+      formalgamma=g.innerTHML;
+
+      y=90;
+      if(gamma<0)
+      {
+         y=Math.abs(gamma);
+      }
+      else
+      {
+         y=180-gamma;
+      }
+
+      x=90;
+      alphamodified = 0;
+      if(gamma<0)
+      {
+          alpha=alpha+180;
+          if (alpha>360)
+          {
+              alpha=alpha-360;
+          }
+      }
+      
+      alphamodified = alpha-a.innerHTML;
+      x=alphamodified;
+
+      if (Math.abs(alpha-formalalpha)>10 || Math.abs(beta-formalbeta)>10 || Math.abs(gamma-formalgamma)>10 )
+      {
+         alphadata = Math.round(y);
+         gammadata = Math.round(x);
+
+         var message = {
+             x: alphadata,
+             y: gammadata,
+         }
+         chatsock.send(JSON.stringify(message));
+         setTimeout(function(){
+              mouseDownCommend(commend)
+         }, 50);  
+      }
+
       a.innerHTML = Math.round(alpha);
       b.innerHTML = Math.round(beta);
       g.innerHTML = Math.round(gamma);
-
-      alphadata = Math.round(alpha);
-      gammadata = Math.round(gamma);
-
-      var message = {
-            x: alphadata,
-            y: gammadata,
-        }
-        chatsock.send(JSON.stringify(message));
-
-      commend={'x':alphadata,'y':gammadata}
-      chatsock.send(commend);
-
-    }, false);
+     }, false);
 
 });
