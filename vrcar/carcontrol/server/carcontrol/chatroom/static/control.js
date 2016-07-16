@@ -83,7 +83,7 @@ $(function() {
          gammadata = Math.round(y);
 
          var message = {
-             x: alphadata,
+             x: 0,
              y: gammadata,
          }
          chatsock.send(JSON.stringify(message));
