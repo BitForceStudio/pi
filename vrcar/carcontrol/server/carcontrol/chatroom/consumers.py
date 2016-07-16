@@ -1,3 +1,4 @@
+
 import re
 import json
 import logging
@@ -90,43 +91,13 @@ def ws_receive(message):
         except ValueError:
             log.debug("ws message isn't json text=%s", data)
             return
-        log.debug("ws message is json text=%s", data)
 
-        movex(data['x'])
+  #      movex(data['x'])
         movey(data['y'])
 
         log.debug("move x:%d  y:%d", data['x'],data['y'])
-
-        if data:
-            log.debug('chat message room=%s commend=%s', 
-                room.label, data)
-            #m = room.messages.create(**data)
-            if data=="up":
-                log.debug("servo up")
-                moveup()
-            elif data=="down":
-                log.debug("servo up")
-                movedown()
-            elif data=="left":
-                log.debug("servo up")
-                moveleft()
-            elif data=="right":
-                log.debug("servo up")
-                moveright()
-            elif data=="forward":
-                log.debug("servo up")
-                moveforward()
-            elif data=="backward":
-                log.debug("servo up")
-                movebackward()
-            elif data=="leftturn":
-                log.debug("servo up")
-                moveleftturn()
-            elif data=="rightturn":
-                log.debug("servo up")
-                moverightturn()
             # See above for the note about Group
-            Group('control-'+label, channel_layer=message.channel_layer).send({'text': data})
+        Group('control-'+label, channel_layer=message.channel_layer).send({'text': data})
     else:
         try:
             data = json.loads(message['text'])
