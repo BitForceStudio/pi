@@ -238,21 +238,21 @@ def moveleft():
         print "quit"
 
 def movex(x):
-    global panVal,pz,pan
+    global tiltVal,pz,tilt
     try:
-        panVal = min (160, panVal+x)
-        panVal = max (20,  panVal+x)
-        pz.setOutput (pan, panVal)
+        tiltVal = min (160, tiltVal+x)
+        tiltVal = max (20,  tiltVal+x)
+        pz.setOutput (tilt, panVal)
     except KeyboardInterrupt:
         print "quit"
 
 
 def movey(y):
-    global tiltVal,pz,tilt
+    global panVal,pz,pan
     try:
-        tiltVal = max (40, y)
-        tiltVal = min (160, y)
-        pz.setOutput (tilt, tiltVal)
+        panVal = max (40, y)
+        panVal = min (160, y)
+        pz.setOutput (pan, panVal)
     except KeyboardInterrupt:
         print "quit"
 
