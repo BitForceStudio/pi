@@ -47,6 +47,12 @@ $(function() {
       formalbeta=b.innerHTML;
       formalgamma=g.innerTHML;
 
+      xhtml = document.getElementById('x'),
+      yhtml = document.getElementById('y'),
+
+      formaly=yhtml.innerHTML;
+      formalx=xhtml.innerHTML;
+
       y=90;
       if(gamma<0)
       {
@@ -71,7 +77,7 @@ $(function() {
       alphamodified = alpha-a.innerHTML;
       x=alphamodified;
 
-      if (Math.abs(alpha-formalalpha)>10 || Math.abs(beta-formalbeta)>10 || Math.abs(gamma-formalgamma)>10 )
+      if (Math.abs(alpha-formalalpha)>10 || Math.abs(beta-formalbeta)>10 || Math.abs(y-formaly)>10 )
       {
          alphadata = Math.round(x);
          gammadata = Math.round(y);
@@ -89,8 +95,7 @@ $(function() {
       a.innerHTML = Math.round(alpha);
       b.innerHTML = Math.round(beta);
       g.innerHTML = Math.round(gamma);
-      xhtml = document.getElementById('x'),
-      yhtml = document.getElementById('y'),
+
       xhtml.innerHTML = Math.round(x);
       yhtml.innerHTML = Math.round(y);
      }, false);
