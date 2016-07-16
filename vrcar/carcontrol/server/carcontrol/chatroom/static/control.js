@@ -82,6 +82,9 @@ $(function() {
          alphadata = Math.round(x);
          gammadata = Math.round(y);
 
+         xhtml.innerHTML = Math.round(x);
+         yhtml.innerHTML = Math.round(y);
+
          var message = {
              x: 0,
              y: gammadata,
@@ -96,8 +99,7 @@ $(function() {
       b.innerHTML = Math.round(beta);
       g.innerHTML = Math.round(gamma);
 
-      xhtml.innerHTML = Math.round(x);
-      yhtml.innerHTML = Math.round(y);
+
      }, false);
 
 });
