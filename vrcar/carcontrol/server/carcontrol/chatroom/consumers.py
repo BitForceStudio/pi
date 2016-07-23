@@ -221,7 +221,7 @@ def movex(x):
 def movey(y):
     global panVal,pz,pan
     try:
-        panVal = max (65, y)
+        panVal = max (70, y)
         panVal = min (150, y)
         pz.setOutput (pan, panVal)
     except KeyboardInterrupt:

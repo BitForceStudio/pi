@@ -77,7 +77,7 @@ $(function() {
       alphamodified = alpha-a.innerHTML;
       x=alphamodified;
 
-      if (Math.abs(alpha-formalalpha)>10 || Math.abs(beta-formalbeta)>10 || Math.abs(y-formaly)>10 )
+      if (Math.abs(alpha-formalalpha)>10 || Math.abs(beta-formalbeta)>10 || Math.abs(y-formaly)>3 )
       {
          alphadata = Math.round(x);
          gammadata = Math.round(y);
@@ -92,7 +92,7 @@ $(function() {
          chatsock.send(JSON.stringify(message));
          setTimeout(function(){
               mouseDownCommend(commend)
-         }, 50);  
+         }, 10);  
       }
 
       a.innerHTML = Math.round(alpha);
