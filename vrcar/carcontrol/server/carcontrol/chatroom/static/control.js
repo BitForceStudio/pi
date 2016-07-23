@@ -49,6 +49,7 @@ $(function() {
 
       xhtml = document.getElementById('x'),
       yhtml = document.getElementById('y'),
+      iahtml = document.getElementById('curralpha'),
 
       formaly=yhtml.innerHTML;
       formalx=xhtml.innerHTML;
@@ -64,7 +65,8 @@ $(function() {
       }
 
       x=90;
-      alphamodified = 0;
+      alphamodified = iahtml.innerHTML;
+
       if(gamma<0)
       {
           alpha=alpha+180;
@@ -73,20 +75,26 @@ $(function() {
               alpha=alpha-360;
           }
       }
-      
-      alphamodified = alpha-a.innerHTML;
-      x=alphamodified;
 
-      if (Math.abs(alpha-formalalpha)>10 || Math.abs(beta-formalbeta)>10 || Math.abs(y-formaly)>3 )
+      alphacurrent = iahtml.innerHTML;
+      alphachange=Math.round(alpha)-alphacurrent;
+      
+      x = alphachange;
+
+      if (Math.abs(x)>4 || Math.abs(beta-formalbeta)>10 || Math.abs(y-formaly)>4 )
       {
          alphadata = Math.round(x);
          gammadata = Math.round(y);
 
          xhtml.innerHTML = Math.round(x);
          yhtml.innerHTML = Math.round(y);
-
+         iahtml.innerHTML=Math.round(alpha);
+         if (Math.abs(x)>20)
+         {
+           x=x/(Math.abs(x))*20;
+         }
          var message = {
-             x: 0,
+             x: x,
              y: gammadata,
          }
          chatsock.send(JSON.stringify(message));
