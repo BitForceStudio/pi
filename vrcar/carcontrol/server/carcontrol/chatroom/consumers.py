@@ -213,7 +213,7 @@ def movex(x):
     try:
         tiltVal = min (160, tiltVal+x)
         tiltVal = max (20,  tiltVal+x)
-        pz.setOutput (tilt, panVal)
+        pz.setOutput (tilt, tiltVal)
     except KeyboardInterrupt:
         print "quit"
 

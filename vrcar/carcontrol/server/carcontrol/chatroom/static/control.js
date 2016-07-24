@@ -35,79 +35,93 @@ $(function() {
         }
     }
 
-    window.addEventListener('deviceorientation', function(event) {
-        var a = document.getElementById('alpha',
-            b = document.getElementById('beta'),
-            g = document.getElementById('gamma'),
-            alpha = event.alpha,
-            beta = event.beta,
-            gamma = event.gamma);
+    window.addEventListener('deviceorientation', function(event) 
+    {
+        var a = document.getElementById('alpha');
+        var b = document.getElementById('beta');
+        var g = document.getElementById('gamma');
+        var alpha = event.alpha;
+        var beta  = event.beta;
+        var gamma = event.gamma;
 
-      formalalpha=a.innerHTML;
-      formalbeta=b.innerHTML;
-      formalgamma=g.innerTHML;
+        formalalpha=a.innerHTML;
+        formalbeta=b.innerHTML;
+        formalgamma=g.innerTHML;
 
-      xhtml = document.getElementById('x'),
-      yhtml = document.getElementById('y'),
-      iahtml = document.getElementById('curralpha'),
+        xhtml = document.getElementById('x'),
+        yhtml = document.getElementById('y'),
+        iahtml = document.getElementById('curralpha'),
 
-      formaly=yhtml.innerHTML;
-      formalx=xhtml.innerHTML;
+        formaly=yhtml.innerHTML;
+        formalx=xhtml.innerHTML;
 
-      y=90;
-      if(gamma<0)
-      {
-         y=Math.abs(gamma);
-      }
-      else
-      {
-         y=180-gamma;
-      }
+        y=90;
+        if(gamma<0)
+        {
+            y=Math.abs(gamma);
+        }
+        else
+        {
+            y=180-gamma;
+        }
 
-      x=90;
-      alphamodified = iahtml.innerHTML;
+        x=90;
+        alphamodified = iahtml.innerHTML;
 
-      if(gamma<0)
-      {
-          alpha=alpha+180;
-          if (alpha>360)
-          {
-              alpha=alpha-360;
-          }
-      }
+        if (alphamodified<-500)
+        {
+            setTimeout(function(){
+            }, 100); 
+            alpha = event.alpha;
 
-      alphacurrent = iahtml.innerHTML;
-      alphachange=Math.round(alpha)-alphacurrent;
+            if(gamma<0)
+            {
+                alpha=alpha+180;
+                if (alpha>360)
+                {
+                    alpha=alpha-360;
+                }
+            }
+            iahtml.innerHTML=alpha;
+        }
+
+        if(gamma<0)
+        {
+            alpha=alpha+180;
+            if (alpha>360)
+            {
+                alpha=alpha-360;
+            }
+        }
+
+        alphacurrent = iahtml.innerHTML;
+        alphachange=Math.round(alpha)-alphacurrent;
       
-      x = alphachange;
+        x = alphachange+90;
 
-      if (Math.abs(x)>4 || Math.abs(beta-formalbeta)>10 || Math.abs(y-formaly)>4 )
-      {
-         alphadata = Math.round(x);
-         gammadata = Math.round(y);
+        if (Math.abs(x)>4 || Math.abs(beta-formalbeta)>10 || Math.abs(y-formaly)>4 )
+        {
+            alphadata = Math.round(x);
+            gammadata = Math.round(y);
 
-         xhtml.innerHTML = Math.round(x);
-         yhtml.innerHTML = Math.round(y);
-         iahtml.innerHTML=Math.round(alpha);
-         if (Math.abs(x)>20)
-         {
-           x=x/(Math.abs(x))*20;
-         }
-         var message = {
-             x: x,
-             y: gammadata,
-         }
-         chatsock.send(JSON.stringify(message));
-         setTimeout(function(){
-              mouseDownCommend(commend)
-         }, 10);  
-      }
+            xhtml.innerHTML = Math.round(x);
+            yhtml.innerHTML = Math.round(y);
 
-      a.innerHTML = Math.round(alpha);
-      b.innerHTML = Math.round(beta);
-      g.innerHTML = Math.round(gamma);
+            var message = {
+                x: x,
+                y: gammadata,
+            }
+            //chatsock.send(JSON.stringify(message));
+            setTimeout(function(){
+                mouseDownCommend(commend)
+            }, 20);  
+        }
+
+        a.innerHTML = Math.round(alpha);
+        b.innerHTML = Math.round(beta);
+        g.innerHTML = Math.round(gamma);
 
 
-     }, false);
+    }, false);
 
 });
