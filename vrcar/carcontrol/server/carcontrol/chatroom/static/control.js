@@ -82,11 +82,7 @@ $(function() {
                     alpha=alpha-360;
                 }
             }
-<<<<<<< HEAD
             iahtml.innerHTML=Math.round(alpha);
-=======
-            iahtml.innerHTML=alpha;
->>>>>>> 83d14dada53a6f3c1fd142ba00dd1945cff5e2d7
         }
 
         if(gamma<0)
@@ -103,11 +99,7 @@ $(function() {
       
         x = alphachange+90;
 
-<<<<<<< HEAD
         if (Math.abs(x-formalx)>4 || Math.abs(y-formaly)>4 )
-=======
-        if (Math.abs(x)>4 || Math.abs(beta-formalbeta)>10 || Math.abs(y-formaly)>4 )
->>>>>>> 83d14dada53a6f3c1fd142ba00dd1945cff5e2d7
         {
             alphadata = Math.round(x);
             gammadata = Math.round(y);
@@ -119,17 +111,10 @@ $(function() {
                 x: x,
                 y: gammadata,
             }
-<<<<<<< HEAD
             chatsock.send(JSON.stringify(message));
             setTimeout(function(){
                 mouseDownCommend(commend)
             }, 10);  
-=======
-            //chatsock.send(JSON.stringify(message));
-            setTimeout(function(){
-                mouseDownCommend(commend)
-            }, 20);  
->>>>>>> 83d14dada53a6f3c1fd142ba00dd1945cff5e2d7
         }
 
         a.innerHTML = Math.round(alpha);

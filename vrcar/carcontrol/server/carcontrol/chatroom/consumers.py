@@ -95,7 +95,15 @@ def ws_receive(message):
         movex(data['x'])
         movey(data['y'])
 
-        log.debug("move x:%d  y:%d", data['x'],data['y'])
+        x = data['x']
+        x = min (140, x)
+        x = max (40,  x)
+
+        y = data['y']
+        y = max (40,  y)
+        y = min (140, y)
+
+        log.debug("move x:%d  y:%d", x, y)
             # See above for the note about Group
         Group('control-'+label, channel_layer=message.channel_layer).send({'text': data})
     else:
@@ -135,10 +143,10 @@ def moverightturn():
     try:
         pz.forward(speed)
         time.sleep(0.05)
-	pz.spinRight(speed)
-	time.sleep(0.05)
-	pz.forward(speed)
-	time.sleep(0.05)
+        pz.spinRight(speed)
+        time.sleep(0.05)
+        pz.forward(speed)
+        time.sleep(0.05)
         pz.stop()
     except KeyboardInterrupt:
         print "quit"
@@ -211,24 +219,19 @@ def moveleft():
 def movex(x):
     global pz,tilt
     try:
-<<<<<<< HEAD
-        x = min (160, x)
-        x = max (20,  x)
-        pz.setOutput (tilt, x)
-=======
-        tiltVal = min (160, tiltVal+x)
-        tiltVal = max (20,  tiltVal+x)
-        pz.setOutput (tilt, tiltVal)
->>>>>>> 83d14dada53a6f3c1fd142ba00dd1945cff5e2d7
+        xx = x
+        xx = min (140, xx)
+        xx = max (40,  xx)
+        pz.setOutput (tilt, xx)
     except KeyboardInterrupt:
         print "quit"
 
-
 def movey(y):
-    global panVal,pz,pan
+    global pz,pan
     try:
-        panVal = max (70, y)
-        panVal = min (150, y)
+        yy = y
+        yy = max (70,  yy)
+        yy = min (150, yy)
         pz.setOutput (pan, panVal)
     except KeyboardInterrupt:
         print "quit"
