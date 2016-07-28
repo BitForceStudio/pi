@@ -211,9 +211,15 @@ def moveleft():
 def movex(x):
     global pz,tilt
     try:
+<<<<<<< HEAD
         x = min (160, x)
         x = max (20,  x)
         pz.setOutput (tilt, x)
+=======
+        tiltVal = min (160, tiltVal+x)
+        tiltVal = max (20,  tiltVal+x)
+        pz.setOutput (tilt, tiltVal)
+>>>>>>> 83d14dada53a6f3c1fd142ba00dd1945cff5e2d7
     except KeyboardInterrupt:
         print "quit"
 
