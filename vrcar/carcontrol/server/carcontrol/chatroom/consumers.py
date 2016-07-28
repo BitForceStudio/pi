@@ -92,7 +92,7 @@ def ws_receive(message):
             log.debug("ws message isn't json text=%s", data)
             return
 
-  #      movex(data['x'])
+        movex(data['x'])
         movey(data['y'])
 
         log.debug("move x:%d  y:%d", data['x'],data['y'])
@@ -209,11 +209,11 @@ def moveleft():
         print "quit"
 
 def movex(x):
-    global tiltVal,pz,tilt
+    global pz,tilt
     try:
-        tiltVal = min (160, tiltVal+x)
-        tiltVal = max (20,  tiltVal+x)
-        pz.setOutput (tilt, panVal)
+        x = min (160, x)
+        x = max (20,  x)
+        pz.setOutput (tilt, x)
     except KeyboardInterrupt:
         print "quit"
 
