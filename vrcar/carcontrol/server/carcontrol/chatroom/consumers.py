@@ -232,7 +232,7 @@ def movey(y):
         yy = y
         yy = max (70,  yy)
         yy = min (150, yy)
-        pz.setOutput (pan, panVal)
+        pz.setOutput (pan, yy)
     except KeyboardInterrupt:
         print "quit"
 
