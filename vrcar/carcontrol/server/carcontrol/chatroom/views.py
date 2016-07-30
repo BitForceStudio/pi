@@ -55,5 +55,5 @@ def control(request,label):
     args={}
     args['label']  ="remotecarcontrol"
     args['control']=0
-    args['debug']  =0
+    args['debug']  =1
     return render(request, "chat/carcontrol.html",args)

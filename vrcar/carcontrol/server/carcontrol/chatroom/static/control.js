@@ -4,8 +4,8 @@
 var $mjpeg_left_img=$("#mjpeg_left");
 var $mjpeg_right_img=$("#mjpeg_right");
 
-var ip_right="http://192.168.1.8:80";
-var ip_left ="http://192.168.1.7:80"
+var ip_right="http://192.168.1.7:80";
+var ip_left ="http://192.168.1.8:80"
 
 var halted = 0;
 var previous_halted = 99;
