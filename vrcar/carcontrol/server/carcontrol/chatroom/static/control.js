@@ -1,3 +1,12 @@
+//
+// MJPEG
+//
+var $mjpeg_img=$("#mjpeg_dest");
+var halted = 0;
+var previous_halted = 99;
+var mjpeg_mode = 0;
+var preview_delay = 0;
+
 $(function() {
     // When we're using HTTPS, use WSS too.
     var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
@@ -5,6 +14,11 @@ $(function() {
 
     var $commendbutton = $("#control").find('button[type="button"]');
     var mouseStillDown = false;
+
+
+    reload_img();
+
+    updatePreview(true);
 
     chatsock.onmessage = function(message) {
         var data = message.data;
@@ -126,17 +140,8 @@ $(function() {
 
 });
 
-//
-// MJPEG
-//
-var mjpeg_img;
-var halted = 0;
-var previous_halted = 99;
-var mjpeg_mode = 0;
-var preview_delay = 0;
-
 function reload_img () {
-  if(!halted) mjpeg_img.src = "http://192.168.1.8:80/cam_pic.php?time=" + new Date().getTime() + "&pDelay=" + preview_delay;
+  if(!halted) $mjpeg_img[0].src = "http://192.168.1.8:80/cam_pic.php?time=" + new Date().getTime() + "&pDelay=" + preview_delay;
   else setTimeout("reload_img()", 500);
 }
 
@@ -146,26 +151,24 @@ function error_img () {
 
 function updatePreview(cycle)
 {
-   if (mjpegmode)
-   {
-      if (cycle !== undefined && cycle == true)
-      {
-         mjpeg_img.src = "192.168.1.8:80/updating.jpg";
-         setTimeout("mjpeg_img.src = \"http://192.168.1.8:80/cam_pic_new.php?time=\" + new Date().getTime()  + \"&pDelay=\" + preview_delay;", 1000);
-         return;
-      }
-      
-      if (previous_halted != halted)
-      {
-         if(!halted)
-         {
-            mjpeg_img.src = "http://192.168.1.8:80/cam_pic_new.php?time=" + new Date().getTime() + "&pDelay=" + preview_delay;			
-         }
-         else
-         {
-            mjpeg_img.src = "/unavailable.jpg";
-         }
-      }
-	previous_halted = halted;
-   }
+  if (cycle !== undefined && cycle == true)
+  {
+     $mjpeg_img[0].src = "192.168.1.8:80/updating.jpg";
+     setTimeout("$mjpeg_img[0].src = \"http://192.168.1.8:80/cam_pic_new.php?time=\" + new Date().getTime()  + \"&pDelay=\" + preview_delay;", 1000);
+     return;
+  }
+  
+  if (previous_halted != halted)
+  {
+     if(!halted)
+     {
+        mjpeg_img.src = "http://192.168.1.8:80/cam_pic_new.php?time=" + new Date().getTime() + "&pDelay=" + preview_delay;			
+     }
+     else
+     {
+        mjpeg_img.src = "/unavailable.jpg";
+     }
+  }
+previous_halted = halted;
+
 }
