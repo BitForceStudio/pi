@@ -4,17 +4,8 @@
 {% load staticfiles %}
 
 <form id="control">
-	<div class="row">
-		<div class="col-xs-6 col-sm-6 col-lg-6">
-			<div>
-				<img id="mjpeg_right" src="http://192.168.1.8:80/loading.jpg">
-			</div>
-     	</div>
-	    <div class="col-xs-6 col-sm-6 col-lg-6">
-	    	<div>
-				<img id="mjpeg_left"  src="http://192.168.1.7:80/loading.jpg">
-			</div>
-	    </div>
+	<div>
+		<img id="mjpeg_left"  src="http://192.168.1.7:80/loading.jpg">
 	</div>
 	<hr>
 	{% if control == 1 %}

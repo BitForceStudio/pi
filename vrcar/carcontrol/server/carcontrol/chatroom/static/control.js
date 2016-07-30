@@ -2,9 +2,9 @@
 // MJPEG
 //
 var $mjpeg_left_img=$("#mjpeg_left");
-var $mjpeg_right_img=$("#mjpeg_right");
+//var $mjpeg_right_img=$("#mjpeg_right");
 
-var ip_right="http://192.168.1.7:80";
+//var ip_right="http://192.168.1.7:80";
 var ip_left ="http://192.168.1.8:80"
 
 var halted = 0;
@@ -145,11 +145,12 @@ $(function() {
 
 });
 
+
 function reload_img () {
     if(!halted) 
     {
         $mjpeg_left_img[0].src = ip_left+"/cam_pic.php?time=" + new Date().getTime() + "&pDelay=" + preview_delay;
-        $mjpeg_right_img[0].src = ip_right+"/cam_pic.php?time=" + new Date().getTime() + "&pDelay=" + preview_delay;
+        //$mjpeg_right_img[0].src = ip_right+"/cam_pic.php?time=" + new Date().getTime() + "&pDelay=" + preview_delay;
     }
     else 
     {
@@ -158,7 +159,7 @@ function reload_img () {
 }
 
 function error_img () {
-    setTimeout("mjpeg_right_img.src = "+ip_right+"'/cam_pic.php?time=' + new Date().getTime();", 100);
+    //setTimeout("mjpeg_right_img.src = "+ip_right+"'/cam_pic.php?time=' + new Date().getTime();", 100);
     setTimeout("mjpeg_left_img.src = "+ip_left+"'/cam_pic.php?time=' + new Date().getTime();", 100);
 }
 
@@ -167,9 +168,9 @@ function updatePreview(cycle)
     if (cycle !== undefined && cycle == true)
     {
         $mjpeg_left_img[0].src = ip_left+"/updating.jpg";
-        $mjpeg_right_img[0].src = ip_right+"/updating.jpg";
-        setTimeout("$mjpeg_right_img[0].src = \" " + ip_right + "/cam_pic_new.php?time=\" + new Date().getTime()  + \"&pDelay=\" + preview_delay;", 100);
-        setTimeout("$mjpeg_left_img[0].src = \" " + ip_left + "/cam_pic_new.php?time=\" + new Date().getTime()  + \"&pDelay=\" + preview_delay;", 100);
+        //$mjpeg_right_img[0].src = ip_right+"/updating.jpg";
+        //setTimeout("$mjpeg_right_img[0].src = \" " + ip_right + "/cam_pic_new.php?time=\" + new Date().getTime()  + \"&pDelay=\" + preview_delay;", 100);
+        setTimeout("$mjpeg_left_img[0].src = \" " + ip_left + "/cam_pic_new.php?time=\" + new Date().getTime()  + \"&pDelay=\" + preview_delay;", 1000);
         return;
     }
   
@@ -178,14 +179,15 @@ function updatePreview(cycle)
         if(!halted)
         {
             $mjpeg_left_img[0].src = ip_left+"/cam_pic.php?time=" + new Date().getTime() + "&pDelay=" + preview_delay;
-            $mjpeg_right_img[0].src = ip_right+"/cam_pic.php?time=" + new Date().getTime() + "&pDelay=" + preview_delay;
+            //$mjpeg_right_img[0].src = ip_right+"/cam_pic.php?time=" + new Date().getTime() + "&pDelay=" + preview_delay;
         }
         else
         {
-            $mjpeg_right_img[0].src = ip_right+"/updating.jpg";
+            //$mjpeg_right_img[0].src = ip_right+"/updating.jpg";
             $mjpeg_left_img[0].src = ip_left+"/updating.jpg";
         }
     }
     previous_halted = halted;
 
 }
+
