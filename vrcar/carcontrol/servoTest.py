@@ -12,6 +12,9 @@ import sys
 import tty
 import termios
 
+temp1 = 120
+temp2 = 120
+
 def readchar():
     fd = sys.stdin.fileno()
     old_settings = termios.tcgetattr(fd)
@@ -58,8 +61,8 @@ pz.setOutputConfig(tilt, 2)
 pz.setOutputConfig(grip, 2)
 
 # Centre all servos
-panVal = 90
-tiltVal = 90
+panVal = temp1
+tiltVal = temp2
 gripVal = 90
 pz.setOutput (pan, panVal)
 pz.setOutput (tilt, tiltVal)
@@ -71,16 +74,16 @@ try:
     while True:
         keyp = readkey()
         if keyp == 'w' or ord(keyp) == 16:
-            panVal = max (65, panVal - step)
+            panVal = max (0, panVal - step)
             print 'Up', panVal
         elif keyp == 'z' or ord(keyp) == 17:
-            panVal = min (160, panVal + step)
+            panVal = min (300, panVal + step)
             print 'Down', panVal
         elif keyp == 's' or ord(keyp) == 18:
-            tiltVal = max (20, tiltVal - step)
+            tiltVal = max (0, tiltVal - step)
             print 'Right', tiltVal
         elif keyp == 'a' or ord(keyp) == 19:
-            tiltVal = min (160, tiltVal + step)
+            tiltVal = min (300, tiltVal + step)
             print 'Left', tiltVal
         elif keyp == 'g':
             gripVal = max (20, gripVal - step)

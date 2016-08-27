@@ -92,17 +92,19 @@ def ws_receive(message):
             log.debug("ws message isn't json text=%s", data)
             return
 
-        movex(data['x'])
-        movey(data['y'])
+        #movex(data['x'])
+        #movey(data['y'])
 
         x = data['x']
-        x = min (140, x)
-        x = max (40,  x)
+        x = max (10, x)
+        x = min (170,  x)
 
         y = data['y']
-        y = max (40,  y)
-        y = min (140, y)
-
+        y = max (10,  y)
+        y = min (170, y)
+        y = 180-y
+        movex(x)
+        movey(y)
         log.debug("move x:%d  y:%d", x, y)
             # See above for the note about Group
         Group('control-'+label, channel_layer=message.channel_layer).send({'text': data})
