@@ -8,44 +8,50 @@ var sleep   = require('sleep');
 var i2c     = require('i2c');
 var address = 0x22;
 
-var MOTORA    = 0
-var OUTCFG0   = 2
-var OUTPUT0   = 8
-var INCFG0    = 14
-var SETBRIGHT = 18
-var UPDATENOW = 19
-var RESET     = 20
+var MOTORA    = 0;
+var OUTCFG0   = 2;
+var OUTPUT0   = 8;
+var INCFG0    = 14;
+var SETBRIGHT = 18;
+var UPDATENOW = 19;
+var RESET     = 20;
 
 //---------------------------------------------
 // General variables
-var DEBUG = False
-var RETRIES = 10  // max number of retries for I2C calls
+var DEBUG = false;
+var RETRIES = 10;  // max number of retries for I2C calls
 //---------------------------------------------
 
-var pan = 0
-var tilt = 1
-var step = 5
+var pan = 0;
+var tilt = 1;
+var step = 5;
 
 
-var wire = new i2c(address, {device: '/dev/i2c-1'});
+var wire = null;
+try{
+  wire = new i2c(address, {device: '/dev/i2c-1'});
+}
+catch(e){
+  console.log("define i2c error");
+}
 
-setOutputConfig()
+init();
 
 //---------------------------------------------
 // Initialise the Board (same as cleanup)
-function init (debug=False){
-  DEBUG = debug；
+function init(debug=false){
+  DEBUG = debug;
   for (var i=0;i<RETRIES;i++){
     try{
-      wire.writeBytes(RESET, 0)；
-      break；
+      wire.writeBytes(RESET, 0, function(err){});
+      break;
     }
-    except{
+    catch(e){
       if (DEBUG)
-        console.log("Error in init(), retrying")；
+        console.log("Error in init(), retrying");
     }
   }
-  sleep.usleep(10)  //1ms delay to allow time to complete
+  sleep.usleep(10);  //1ms delay to allow time to complete
   if (DEBUG)
     console.log("Debug is", DEBUG);
 }
@@ -53,19 +59,19 @@ function init (debug=False){
 
 //---------------------------------------------
 // Cleanup the Board (same as init)
-function cleanup ()
+function cleanup()
 {
   for (var i=0;i<RETRIES;i++){
     try{
-      wire.writeBytes(RESET, 0);
+      wire.writeBytes(RESET, 0, function(err){});
       break;
     }
-    except(e){
+    catch(e){
       if (DEBUG)
         console.log("Error in cleanup(), retrying");
     }
   }
-  sleep.usleep(1)   # 1ms delay to allow time to complete
+  sleep.usleep(1)   // 1ms delay to allow time to complete
 }
 //---------------------------------------------
 
@@ -78,11 +84,11 @@ function setOutputConfig (output, value){
       try{
         wire.writeBytes(OUTCFG0 + output, value, function(err){
           if (err)
-        	  console.log('writeBytes error'+err)
+            console.log('writeBytes error'+err)
         });
         break;
       }
-      except(e){
+      catch(e){
         if (DEBUG)
           console.log("Error in setOutputConfig(), retrying");
       }
@@ -104,15 +110,16 @@ function setOutput (channel, value){
       try{
         wire.writeBytes(OUTPUT0 + channel, value, function(err){
           if (err)
-            console.log('writeBytes error'+err)
+            console.log('writeBytes error'+err);
         });
         break;
       }
-      except(e){
+      catch(e){
         if (DEBUG)
           console.log("Error in setOutput(), retrying");
       }
     }
+  }
 }
 //---------------------------------------------
 // network
@@ -124,11 +131,7 @@ app.get('/', function(req, res){
 io.on('connection', function(socket){
   socket.on('control', function(msg){
     console.log('message: ' + msg);
-
-    
-
   });
-  // need to call the python script
 });
 
 http.listen(3000, function(){
