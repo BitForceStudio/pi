@@ -4,7 +4,8 @@ var io      = require('socket.io')(http);
 var sleep   = require('sleep');
 
 // I2C driver
-var i2c     = require('i2c');
+var i2c = require('i2c-bus'),
+   wire = i2c.openSync(1);
 var address = 0x22;
 
 var MOTORA    = 0;
@@ -25,8 +26,6 @@ var pan  = 0;
 var tilt = 1;
 var step = 5;
 
-
-var wire = null;
 try{
   initall();
 }
@@ -37,35 +36,8 @@ catch(e){
 var panVal = 90;
 var tiltVal = 90;
 
-function setupi2c(){
-  try{
-    console.log('set up i2c')
-    wire = new i2c(address, {device: '/dev/i2c-1'});
-  }
-  catch(e){
-    console.log("define i2c error"+e);
-  }
-}
-
-function showadd(){
-  wire.scan(function(err, data) {
-    if(err)
-      console.log('get address error: '+err)
-    else
-      console.log('address is '+data);
-  });
-  wire.readByte(function(err, res) {
-    if(err)
-      console.log('read err: '+err)
-    else
-      console.log('read:' +res); 
-  }); 
-}
-
 function initall(){
   // init
-  setupi2c();
-  showadd();
   init(true);
   setOutputConfig(pan, 2);
   setOutputConfig(tilt, 2);
@@ -79,10 +51,7 @@ function init(debug=false){
   DEBUG = debug;
   for (var i=0;i<RETRIES;i++){
     try{
-      wire.writeBytes(RESET, 0, function(err){
-        if (err)
-          console.log("wire write on init failed because of "+err);
-      });
+      wire.writeByteSync(address, RESET, 0);
       break;
     }
     catch(e){
@@ -102,7 +71,7 @@ function cleanup()
 {
   for (var i=0;i<RETRIES;i++){
     try{
-      wire.writeBytes(RESET, 0, function(err){});
+      wire.writeByteSync(address, RESET, 0);
       break;
     }
     catch(e){
@@ -124,10 +93,7 @@ function setOutputConfig (output, value){
       console.log("set output config called, cmd:"+output+" value:"+value);
     for (var i=0;i<RETRIES;i++){
       try{
-        wire.writeBytes(OUTCFG0+output, value, function(err){
-          if (err)
-            console.log('writeBytes error'+err)
-        });
+        wire.writeByteSync(address, OUTCFG0+output, value);
         break;
       }
       catch(e){
@@ -152,12 +118,7 @@ function setOutput (channel, value){
       console.log("set output called");
     for (var i=0;i<RETRIES;i++){
       try{
-        wire.writeBytes(OUTPUT0 + channel, value, function(err){
-          if (err)
-            console.log('writeBytes error'+err);
-          else
-            sleep.usleep(10);
-        });
+        wire.writeByteSync(address, OUTPUT0 + channel, value);
         if(DEBUG)
           console.log('set output, channel: '+channel+" value:"+value);
         break;
