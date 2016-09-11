@@ -3,7 +3,6 @@ var http    = require('http').Server(app);
 var io      = require('socket.io')(http);
 var sleep   = require('sleep');
 
-
 // I2C driver
 var i2c     = require('i2c');
 var address = 0x22;
@@ -22,20 +21,57 @@ var DEBUG = false;
 var RETRIES = 10;  // max number of retries for I2C calls
 //---------------------------------------------
 
-var pan = 0;
+var pan  = 0;
 var tilt = 1;
 var step = 5;
 
 
 var wire = null;
 try{
-  wire = new i2c(address, {device: '/dev/i2c-1'});
+  initall();
 }
 catch(e){
-  console.log("define i2c error");
+  console.log("define 2 i2c error"+e);
 }
 
-init();
+var panVal = 90;
+var tiltVal = 90;
+
+function setupi2c(){
+  try{
+    console.log('set up i2c')
+    wire = new i2c(address, {device: '/dev/i2c-1'});
+  }
+  catch(e){
+    console.log("define i2c error"+e);
+  }
+}
+
+function showadd(){
+  wire.scan(function(err, data) {
+    if(err)
+      console.log('get address error: '+err)
+    else
+      console.log('address is '+data);
+  });
+  wire.readByte(function(err, res) {
+    if(err)
+      console.log('read err: '+err)
+    else
+      console.log('read:' +res); 
+  }); 
+}
+
+function initall(){
+  // init
+  setupi2c();
+  showadd();
+  init(true);
+  setOutputConfig(pan, 2);
+  setOutputConfig(tilt, 2);
+  setOutput(pan,  20);
+  setOutput(tilt, 120 );
+}
 
 //---------------------------------------------
 // Initialise the Board (same as cleanup)
@@ -43,7 +79,10 @@ function init(debug=false){
   DEBUG = debug;
   for (var i=0;i<RETRIES;i++){
     try{
-      wire.writeBytes(RESET, 0, function(err){});
+      wire.writeBytes(RESET, 0, function(err){
+        if (err)
+          console.log("wire write on init failed because of "+err);
+      });
       break;
     }
     catch(e){
@@ -71,6 +110,7 @@ function cleanup()
         console.log("Error in cleanup(), retrying");
     }
   }
+  console.log('clean up')
   sleep.usleep(1)   // 1ms delay to allow time to complete
 }
 //---------------------------------------------
@@ -80,9 +120,11 @@ function cleanup()
 // 0: On/Off, 1: PWM, 2: Servo, 3: WS2812B
 function setOutputConfig (output, value){
   if (output>=0 && output<=5 && value>=0 && value<=3){
+    if (DEBUG)
+      console.log("set output config called, cmd:"+output+" value:"+value);
     for (var i=0;i<RETRIES;i++){
       try{
-        wire.writeBytes(OUTCFG0 + output, value, function(err){
+        wire.writeBytes(OUTCFG0+output, value, function(err){
           if (err)
             console.log('writeBytes error'+err)
         });
@@ -106,17 +148,23 @@ function setOutputConfig (output, value){
 // 3     WS2812B 4 Bytes 0:Pixel ID, 1:Red, 2:Green, 3:Blue
 function setOutput (channel, value){
   if (channel>=0 && channel<=5){
+    if (DEBUG)
+      console.log("set output called");
     for (var i=0;i<RETRIES;i++){
       try{
         wire.writeBytes(OUTPUT0 + channel, value, function(err){
           if (err)
             console.log('writeBytes error'+err);
+          else
+            sleep.usleep(10);
         });
+        if(DEBUG)
+          console.log('set output, channel: '+channel+" value:"+value);
         break;
       }
       catch(e){
         if (DEBUG)
-          console.log("Error in setOutput(), retrying");
+          console.log("Error in setOutput(), retrying"+e+" "+value);
       }
     }
   }
@@ -130,7 +178,16 @@ app.get('/', function(req, res){
 
 io.on('connection', function(socket){
   socket.on('control', function(msg){
-    console.log('message: ' + msg);
+    var data = JSON.parse(msg);
+    var x = data.x;
+    var y = data.y;
+    console.log('message: x: ' + x+' y:'+y);
+    var xx = Math.min(140, x)
+    xx = Math.max(40,  xx)
+    setOutput (tilt, xx)
+    var yy = Math.max(70,  y)
+    yy = Math.min(150, yy)
+    setOutput (pan, yy)    
   });
 });
 
