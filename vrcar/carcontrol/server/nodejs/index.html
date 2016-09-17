@@ -104,9 +104,9 @@
                   }
                   socket.emit('control', JSON.stringify(message));
 
-                  setTimeout(function(){}, sampletime/2);  
+                  setTimeout(function(){}, sampletime);  
               }
-              setTimeout(function(){}, sampletime/2);
+              setTimeout(function(){}, sampletime);
               a.innerHTML = Math.round(alpha);
               b.innerHTML = Math.round(beta);
               g.innerHTML = Math.round(gamma);

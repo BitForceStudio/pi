@@ -41,8 +41,8 @@ function initall(){
   init(true);
   setOutputConfig(pan, 2);
   setOutputConfig(tilt, 2);
-  setOutput(pan,  20);
-  setOutput(tilt, 120 );
+  setOutput(pan,  90 );
+  setOutput(tilt, 90 );
 }
 
 //---------------------------------------------
@@ -141,14 +141,15 @@ io.on('connection', function(socket){
   socket.on('control', function(msg){
     var data = JSON.parse(msg);
     var x = data.x;
-    var y = data.y;
+    var y = 180-data.y;
     console.log('message: x: ' + x+' y:'+y);
-    var xx = Math.min(140, x)
-    xx = Math.max(40,  xx)
-    setOutput (tilt, xx)
-    var yy = Math.max(70,  y)
-    yy = Math.min(150, yy)
-    setOutput (pan, yy)    
+    var xx = Math.min(140, x);
+    xx = Math.max(40,  xx);
+    setOutput (tilt, xx);
+    var yy = Math.max(40,  y);
+    yy = Math.min(150, yy);
+    setOutput (pan, yy);
+    sleep.usleep(10);    
   });
 });
 
