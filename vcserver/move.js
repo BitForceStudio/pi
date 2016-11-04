@@ -22,10 +22,6 @@ var DEBUG = false;
 var RETRIES = 10;  // max number of retries for I2C calls
 //---------------------------------------------
 
-var pan  = 0;
-var tilt = 1;
-var step = 5;
-
 try{
   initall();
 }
@@ -33,17 +29,6 @@ catch(e){
   console.log("define 2 i2c error"+e);
 }
 
-var panVal = 90;
-var tiltVal = 90;
-
-function initall(){
-  // init
-  init(true);
-  setOutputConfig(pan, 2);
-  setOutputConfig(tilt, 2);
-  setOutput(pan,  90 );
-  setOutput(tilt, 90 );
-}
 
 //---------------------------------------------
 // Initialise the Board (same as cleanup)
@@ -85,77 +70,81 @@ function cleanup()
 //---------------------------------------------
 
 //---------------------------------------------
-// Set configuration of selected output
-// 0: On/Off, 1: PWM, 2: Servo, 3: WS2812B
-function setOutputConfig (output, value){
-  if (output>=0 && output<=5 && value>=0 && value<=3){
-    if (DEBUG)
-      console.log("set output config called, cmd:"+output+" value:"+value);
-    for (var i=0;i<RETRIES;i++){
-      try{
-        wire.writeByteSync(address, OUTCFG0+output, value);
-        break;
-      }
-      catch(e){
-        if (DEBUG)
-          console.log("Error in setOutputConfig(), retrying");
-      }
+// motor must be in range 0..1
+// value must be in range -128 - +127
+// values of -127, -128, +127 are treated as always ON,, no PWM
+function setMotor (motor, value)
+{
+    if (motor>=0 and motor<=1 and value>=-128 and value<128)
+    {
+        for(var i=0;i<RETRIES;i++)
+        {
+            try
+            {
+                wire.writeByteSync(address, motor, value);
+                break;
+            }
+            catch(e)
+            {
+                if (DEBUG)
+                    console.log("Error in set motor, retrying");
+            }
+        }
     }
-  }
 }
-//---------------------------------------------
+
+function forward(speed)
+{
+    setMotor(0,speed);
+    setMotor(1,speed);
+}
+
+function spin(speed)
+{
+    setMotor(0,-speed);
+    setMotor(1,speed);
+}
+
+function stop()
+{
+    setMotor(0,0);
+    setMotor(1,0);
+}
 
 //---------------------------------------------
-// Set output data for selected output channel
-// Mode  Name    Type    Values
-// 0     On/Off  Byte    0 is OFF, 1 is ON
-// 1     PWM     Byte    0 to 100 percentage of ON time
-// 2     Servo   Byte    -100 to + 100 Position in degrees
-// 3     WS2812B 4 Bytes 0:Pixel ID, 1:Red, 2:Green, 3:Blue
-function setOutput (channel, value){
-  if (channel>=0 && channel<=5){
-    if (DEBUG)
-      console.log("set output called");
-    for (var i=0;i<RETRIES;i++){
-      try{
-        wire.writeByteSync(address, OUTPUT0 + channel, value);
-        if(DEBUG)
-          console.log('set output, channel: '+channel+" value:"+value);
-        break;
-      }
-      catch(e){
-        if (DEBUG)
-          console.log("Error in setOutput(), retrying"+e+" "+value);
-      }
-    }
-    if (i==RETRIES){
-      cleanup();
-    }
-  }
-}
+
 //---------------------------------------------
 // network
 
 app.get('/', function(req, res){
-  res.sendfile(__dirname + '/index.html');
+  res.sendfile(__dirname + '/move.html');
 });
 
 io.on('connection', function(socket){
   socket.on('control', function(msg){
     var data = JSON.parse(msg);
     var x = data.x;
-    var y = 180-data.y;
+    var y = data.y;
+    var xx = Math.min(180, x);
+    xx = Math.max(0,  xx);
+    var fspeed = 127/90*(xx-90);
+    var yy = Math.max(0,  y);
+    yy = Math.min(180, yy);
+    var sspeed = 127/90*(yy-90);
+    if (xx < 10 && xx > -10 && yy < 10 && yy > -10)
+    {
+      stop();
+    }
+    else
+    {
+      forward(fspeed);
+      spin(sspeed);
+    }
     console.log('message: x: ' + x+' y:'+y);
-    var xx = Math.min(140, x);
-    xx = Math.max(40,  xx);
-    setOutput (tilt, xx);
-    var yy = Math.max(40,  y);
-    yy = Math.min(150, yy);
-    setOutput (pan, yy);
     sleep.usleep(10);    
   });
 });
 
-http.listen(3000, function(){
-  console.log('listening on *:3000');
+http.listen(3001, function(){
+  console.log('listening on *:3001');
 });

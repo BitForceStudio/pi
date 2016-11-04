@@ -2,3 +2,7 @@
 /.pydevproject
 /.pyc
 /.sqlite3
+
+*.jpg
+
+*.h264
