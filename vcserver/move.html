@@ -27,27 +27,28 @@
               var beta  = event.beta;
               var gamma = event.gamma;
 
-              xhtml = document.getElementById('x'),
-              yhtml = document.getElementById('y'),
-              zhtml = document.getElementById('z'),
-
-              /*
-              if (Math.abs(x-formalx)>4 || Math.abs(y-formaly)>4 )
+              xhtml = document.getElementById('x');
+              yhtml = document.getElementById('y');
+               
+              
+              a = document.getElementById('alpha');
+              b = document.getElementById('beta');
+              g = document.getElementById('gamma');
+	      x = Math.round(beta);
+              y = Math.round(gamma);
+              if (Math.abs(x)>4 || Math.abs(y)>4 )
               {
-                  alphadata = Math.round(x);
-                  gammadata = Math.round(y);
-
                   xhtml.innerHTML = Math.round(x);
                   yhtml.innerHTML = Math.round(y);
 
                   var message = {
                       x: x,
-                      y: gammadata,
+                      y: y,
                   }
                   socket.emit('control', JSON.stringify(message));
 
                   setTimeout(function(){}, sampletime);  
-              }*/
+              }
               setTimeout(function(){}, sampletime);
               a.innerHTML = Math.round(alpha);
               b.innerHTML = Math.round(beta);

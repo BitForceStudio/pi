@@ -18,16 +18,9 @@ var RESET     = 20;
 
 //---------------------------------------------
 // General variables
-var DEBUG = false;
+var DEBUG = true;
 var RETRIES = 10;  // max number of retries for I2C calls
 //---------------------------------------------
-
-try{
-  initall();
-}
-catch(e){
-  console.log("define 2 i2c error"+e);
-}
 
 
 //---------------------------------------------
@@ -49,6 +42,8 @@ function init(debug=false){
     console.log("Debug is", DEBUG);
 }
 //---------------------------------------------
+
+init();
 
 //---------------------------------------------
 // Cleanup the Board (same as init)
@@ -75,7 +70,7 @@ function cleanup()
 // values of -127, -128, +127 are treated as always ON,, no PWM
 function setMotor (motor, value)
 {
-    if (motor>=0 and motor<=1 and value>=-128 and value<128)
+    if (motor>=0 && motor<=1 && value>=-128 && value<128)
     {
         for(var i=0;i<RETRIES;i++)
         {
@@ -95,14 +90,14 @@ function setMotor (motor, value)
 
 function forward(speed)
 {
-    setMotor(0,speed);
-    setMotor(1,speed);
+    setMotor(0,100);
+    setMotor(1,100);
 }
 
 function spin(speed)
 {
-    setMotor(0,-speed);
-    setMotor(1,speed);
+    setMotor(0,-100);
+    setMotor(1,100);
 }
 
 function stop()
@@ -117,7 +112,7 @@ function stop()
 // network
 
 app.get('/', function(req, res){
-  res.sendfile(__dirname + '/move.html');
+  res.sendFile(__dirname + '/move.html');
 });
 
 io.on('connection', function(socket){
@@ -127,20 +122,22 @@ io.on('connection', function(socket){
     var y = data.y;
     var xx = Math.min(180, x);
     xx = Math.max(0,  xx);
-    var fspeed = 127/90*(xx-90);
+    var fspeed = 100;//127/90*(xx-90);
     var yy = Math.max(0,  y);
     yy = Math.min(180, yy);
-    var sspeed = 127/90*(yy-90);
+    var sspeed = 0;//127/90*(yy-90);
     if (xx < 10 && xx > -10 && yy < 10 && yy > -10)
     {
+      console.log('stop now');
       stop();
     }
     else
     {
+      console.log('move');
       forward(fspeed);
       spin(sspeed);
     }
-    console.log('message: x: ' + x+' y:'+y);
+    console.log('message: x  speed: ' + x+'  '+fspeed+' y  speed:'+y+'  '+sspeed);
     sleep.usleep(10);    
   });
 });
