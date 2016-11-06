@@ -88,16 +88,10 @@ function setMotor (motor, value)
     }
 }
 
-function forward(speed)
+function forward(leftspeed,rightspeed)
 {
-    setMotor(0,100);
-    setMotor(1,100);
-}
-
-function spin(speed)
-{
-    setMotor(0,-100);
-    setMotor(1,100);
+    setMotor(0,leftspeed);
+    setMotor(1,rightspeed);
 }
 
 function stop()
@@ -121,11 +115,23 @@ io.on('connection', function(socket){
     var x = data.x;
     var y = data.y;
     var xx = Math.min(180, x);
-    xx = Math.max(0,  xx);
-    var fspeed = 100;//127/90*(xx-90);
-    var yy = Math.max(0,  y);
-    yy = Math.min(180, yy);
-    var sspeed = 0;//127/90*(yy-90);
+    xx = Math.max(-180, xx);
+    var yy = Math.min(180,  y);
+    yy = Math.max(-180, yy);
+    
+    var leftspeed = 0;
+    var rightspeed = 0;
+    if (yy > 5 || (xx<-5 || xx>5))
+    {
+      leftspeed  = xx + yy;
+      rightspeed = yy - xx;
+    }
+    else if (yy<-5 || (xx<-5 || xx>5))
+    {
+      leftspeed  = yy - xx;
+      rightspeed = yy + xx; 
+    }
+   
     if (xx < 10 && xx > -10 && yy < 10 && yy > -10)
     {
       console.log('stop now');
@@ -134,10 +140,9 @@ io.on('connection', function(socket){
     else
     {
       console.log('move');
-      forward(fspeed);
-      spin(sspeed);
+      forward(leftspeed,rightspeed);
     }
-    console.log('message: x  speed: ' + x+'  '+fspeed+' y  speed:'+y+'  '+sspeed);
+    console.log('message: x  speed: ' + xx+' leftspeed '+leftspeed+' y  speed:'+yy+' rightspeed '+rightspeed);
     sleep.usleep(10);    
   });
 });
