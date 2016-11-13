@@ -134,8 +134,8 @@
                 yhtml.innerHTML = Math.round(y);
 
                 var message = {
-                    x: x,
-                    y: y,
+                    x: -x*2,
+                    y: -y*2,
                 }
                 socket.emit('control', JSON.stringify(message)); 
             }
@@ -151,6 +151,11 @@
         var message = {
                     x: 0,
                     y: 0,
+        }
+        socket.emit('move', JSON.stringify(message));
+        var message = {
+                    x: 90,
+                    y: 90,
         }
         socket.emit('control', JSON.stringify(message));
       });
