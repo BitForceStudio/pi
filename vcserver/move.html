@@ -134,12 +134,12 @@
                 yhtml.innerHTML = Math.round(y);
 
                 var message = {
-                    x: -x*2,
-                    y: -y*2,
+                    x: -x*1.8+90,
+                    y: -y*1.8+90,
                 }
                 socket.emit('control', JSON.stringify(message)); 
             }
-          }, 20);
+          }, 10);
         }
         else if (ctrlv==true) // use 3-axis to control the vr set only
         {
