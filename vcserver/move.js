@@ -1,7 +1,9 @@
 var app     = require('express')();
 var http    = require('http').Server(app);
+var express = require('express');
 var io      = require('socket.io')(http);
 var sleep   = require('sleep');
+var path    = require('path');
 
 // I2C driver
 var i2c = require('i2c-bus'),
@@ -108,6 +110,8 @@ function stop()
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/move.html');
 });
+
+app.use(express.static(path.join(__dirname, '')));
 
 io.on('connection', function(socket){
   socket.on('control', function(msg){

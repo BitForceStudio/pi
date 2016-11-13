@@ -1,1 +1,3 @@
 sudo npm install socket.io -g
+sudo npm install sleep -g
+sudo npm install i2c-bus -g

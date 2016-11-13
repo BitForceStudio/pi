@@ -4,6 +4,35 @@
       <title>nodejs control</title>
   </head>
   <body>
+    <link rel="stylesheet" type="text/css" href="/move.css" />
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+    <script src="http://jeromeetienne.github.io/threex.keyboardstate/threex.keyboardstate.js"></script>
+    <script src="/virtualjoystick.js"></script>
+
+    <div id="container" style="height:500px;width:600px;background-color:#AAA">
+      <div><img id="mjpeg_left" onclick="toggle_fullscreen(this);" src="http://192.168.1.8:80/loading.jpg"></div>
+    </div>
+    <div id="init_control_ui" style="margin-top:10px">
+      <label>CTRL</label>
+      <label class="switch">
+        <input id="ctrl" type="checkbox">
+        <div class="slider round"></div>
+      </label>
+      <label>IMG</label>
+
+      <div id="vrctrl" style="display:inline">
+        <label>JSK</label>
+        <label class="switch">
+          <input id="vrc" type="checkbox">
+          <div class="slider round"></div>
+        </label>
+        <label>VRC</label>
+      </div>
+      
+    </div>
+    <button type="button" id="conf_ctrl_ui" style="margin-top:10px;height:30px;width:60px">OK</button>
+    <div>
       alpha:<span id="alpha"></span><br/>
       beta:<span id="beta"></span><br/>
       gamma:<span id="gamma"></span><br/>
@@ -11,53 +40,196 @@
       y:<span id="y"></span><br/>
       z:<span id="z"></span><br/>
 
-      <script src="/socket.io/socket.io.js"></script>
-      <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
-      <script type="text/javascript">
-      //
-      // MJPEG
-      //
+      <span id="result"></span>
+    </div>
+
+    <script>
+      console.log("touchscreen is", VirtualJoystick.touchScreenAvailable() ? "available" : "not available");
+      var $mjpeg_left_img=$("#mjpeg_left");
+      var ip_left ="http://192.168.1.8:80"
+
+      var halted = 0;
+      var previous_halted = 99;
+      var mjpeg_mode = 0;
+      var preview_delay = 0;
       var socket = io();
       var sampletime = 10;
+  
+      var joystick  = new VirtualJoystick({
+        container : document.getElementById('container'),
+        mouseSupport  : true,
+        limitStickTravel: true,
+        stickRadius : 100
+      });
+      joystick.addEventListener('touchStart', function(){
+        console.log('down')
+      })
+      joystick.addEventListener('touchEnd', function(){
+        console.log('up')
+      })
+      
+      var $confui = $("#conf_ctrl_ui");
+      var $ctrlimg = $("#init_control_ui").find('input[id=ctrl]');
 
-      $(function() {
-          window.addEventListener('deviceorientation', function(event) 
-          {
-              var alpha = event.alpha;
-              var beta  = event.beta;
-              var gamma = event.gamma;
-
-              xhtml = document.getElementById('x');
-              yhtml = document.getElementById('y');
-               
-              
-              a = document.getElementById('alpha');
-              b = document.getElementById('beta');
-              g = document.getElementById('gamma');
-	      x = Math.round(beta);
-              y = Math.round(gamma);
-              if (Math.abs(x)>4 || Math.abs(y)>4 )
-              {
-                  xhtml.innerHTML = Math.round(x);
-                  yhtml.innerHTML = Math.round(y);
-
-                  var message = {
-                      x: x,
-                      y: y,
-                  }
-                  socket.emit('control', JSON.stringify(message));
-
-                  setTimeout(function(){}, sampletime);  
-              }
-              setTimeout(function(){}, sampletime);
-              a.innerHTML = Math.round(alpha);
-              b.innerHTML = Math.round(beta);
-              g.innerHTML = Math.round(gamma);
-
-
-          }, false);
+      $ctrlimg.on("click",function(event){
+        var ctrlv = $("#ctrl")[0].checked;
+        if(ctrlv==true)
+        {
+          $("#vrc")[0].disabled = true;
+          $("#vrctrl")[0].style.display = "none";
+        }
+        else
+        {
+          $("#vrc")[0].disabled = false;
+          $("#vrctrl")[0].style.display = "inline";
+        }
 
       });
+
+      $confui.on("click",function(event){
+
+        var $input = $("#ctrl");
+        var ctrlv = $("#ctrl")[0].checked;
+        var vrcv  = $("#vrc")[0].checked;
+        if (ctrlv==false && vrcv == false)  // defualt control mode. use virual joystick to control the movement and vr set, show the image on screen
+        {
+          reload_img();
+          updatePreview(true);
+
+          setInterval(function(){
+            var outputEl  = document.getElementById('result');
+            outputEl.innerHTML  = '<b>Result:</b> '
+              + ' dx:'+joystick.deltaX()
+              + ' dy:'+joystick.deltaY()
+              + (joystick.right() ? ' right'  : '')
+              + (joystick.up()  ? ' up'   : '')
+              + (joystick.left()  ? ' left' : '')
+              + (joystick.down()  ? ' down'   : '') 
+          }, 1/10 * 1000);
+        }
+        else if (ctrlv==false && vrcv == true) // use joy stick to control the movement only. vr set will be controlled by other phone
+        {
+
+        }
+        else if (ctrlv==true) // use 3-axis to control the vr set only
+        {
+
+        }
+      });
+
+      function reload_img () {
+          if(!halted) 
+          {
+              $mjpeg_left_img[0].src = ip_left+"/cam_pic.php?time=" + new Date().getTime() + "&pDelay=" + preview_delay;
+          }
+          else 
+          {
+              setTimeout("reload_img()", 500);
+          }
+      }
+
+      function error_img () {
+          setTimeout("mjpeg_left_img.src = "+ip_left+"'/cam_pic.php?time=' + new Date().getTime();", 100);
+      }
+
+      function updatePreview(cycle)
+      {
+          if (cycle !== undefined && cycle == true)
+          {
+              $mjpeg_left_img[0].src = ip_left+"/updating.jpg";
+              setTimeout("$mjpeg_left_img[0].src = \" " + ip_left + "/cam_pic_new.php?time=\" + new Date().getTime()  + \"&pDelay=\" + preview_delay;", 1000);
+              return;
+          }
+        
+          if (previous_halted != halted)
+          {
+              if(!halted)
+              {
+                  $mjpeg_left_img[0].src = ip_left+"/cam_pic.php?time=" + new Date().getTime() + "&pDelay=" + preview_delay;
+              }
+              else
+              {
+                  $mjpeg_left_img[0].src = ip_left+"/updating.jpg";
+              }
+          }
+          previous_halted = halted;
+
+      }
+    //
+    // MJPEG
+    //
+    /*
+    var socket = io();
+    var sampletime = 10;
+    var qctrl = 0;
+    var qvrc  = 0;
+
+    $(function() {
+        window.addEventListener('deviceorientation', function(event) 
+        {
+            var alpha = event.alpha;
+            var beta  = event.beta;
+            var gamma = event.gamma;
+
+            xhtml = document.getElementById('x');
+            yhtml = document.getElementById('y');
+             
+            
+            a = document.getElementById('alpha');
+            b = document.getElementById('beta');
+            g = document.getElementById('gamma');
+            x = Math.round(beta);
+            y = Math.round(gamma);
+            if (Math.abs(x)>4 || Math.abs(y)>4 )
+            {
+                xhtml.innerHTML = Math.round(x);
+                yhtml.innerHTML = Math.round(y);
+
+                var message = {
+                    x: x,
+                    y: y,
+                }
+                socket.emit('control', JSON.stringify(message));
+
+                setTimeout(function(){}, sampletime);  
+            }
+            setTimeout(function(){}, sampletime);
+            a.innerHTML = Math.round(alpha);
+            b.innerHTML = Math.round(beta);
+            g.innerHTML = Math.round(gamma);
+
+
+        }, false);
+
+        $('#ctrl').on("click", function( event )
+        {
+          if (qctrl==0) 
+          {
+
+            qctrl = 1;
+          }
+          else          
+          {
+
+            qctrl = 0;
+          }
+        });
+
+        $('#qvrc').on("click", function( event )
+        {
+          if (qvrc==0) 
+          {
+
+            qvrc = 1;
+          }
+          else         
+          {
+
+            qvrc = 0;
+          }
+        });
+
+      });*/
     </script>
   </body>
 </html>
