@@ -90,8 +90,33 @@
         var $input = $("#ctrl");
         var ctrlv = $("#ctrl")[0].checked;
         var vrcv  = $("#vrc")[0].checked;
-        
+
         if (ctrlv==false && vrcv == false)  // defualt control mode. use virual joystick to control the movement and vr set, show the image on screen
+        {
+          reload_img();
+          updatePreview(true);
+
+          setInterval(function(){
+
+            x = Math.round(joystick.deltaX());
+            y = Math.round(joystick.deltaY());
+
+            xhtml = document.getElementById('x');
+            yhtml = document.getElementById('y');
+            if (Math.abs(x)>10 || Math.abs(y)>10 )
+            {
+                xhtml.innerHTML = Math.round(x);
+                yhtml.innerHTML = Math.round(y);
+
+                var message = {
+                    x: x,
+                    y: y,
+                }
+                socket.emit('move', JSON.stringify(message)); 
+            }
+          }, 20);
+        }
+        else if (ctrlv==false && vrcv == true) // use joy stick to control the VR only.
         {
           reload_img();
           updatePreview(true);
@@ -115,10 +140,6 @@
                 socket.emit('control', JSON.stringify(message)); 
             }
           }, 20);
-        }
-        else if (ctrlv==false && vrcv == true) // use joy stick to control the movement only. vr set will be controlled by other phone
-        {
-
         }
         else if (ctrlv==true) // use 3-axis to control the vr set only
         {
