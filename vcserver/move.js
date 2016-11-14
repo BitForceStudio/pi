@@ -225,8 +225,8 @@ io.on('connection', function(socket){
     var x = data.x;
     var y = 180-data.y;
     console.log('message: x: ' + x+' y:'+y);
-    var xx = Math.min(140, x);
-    xx = Math.max(40,  xx);
+    var xx = Math.min(170, x);
+    xx = Math.max(50,  xx);
     setOutput (tilt, xx);
     var yy = Math.max(40,  y);
     yy = Math.min(150, yy);
