@@ -10,9 +10,6 @@
     <script src="http://jeromeetienne.github.io/threex.keyboardstate/threex.keyboardstate.js"></script>
     <script src="/virtualjoystick.js"></script>
 
-    <div id="container" style="height:800px;width:600px;background-color:#AAA">
-      <div><img id="mjpeg_left" onclick="toggle_fullscreen(this);" src="http://192.168.1.8:80/loading.jpg"></div>
-    </div>
     <div id="init_control_ui" style="margin-top:10px">
       <label>CTRL</label>
       <label class="switch">
@@ -43,14 +40,6 @@
 
     <script>
       console.log("touchscreen is", VirtualJoystick.touchScreenAvailable() ? "available" : "not available");
-      var $mjpeg_left_img=$("#mjpeg_left");
-      var ip_left ="http://192.168.1.8:80"
-
-      var halted = 0;
-      var previous_halted = 99;
-      var mjpeg_mode = 0;
-      var preview_delay = 0;
-      var sampletime = 10;
 
       var socket = io();
   
@@ -118,9 +107,6 @@
         }
         else if (ctrlv==false && vrcv == true) // use joy stick to control the VR only.
         {
-          reload_img();
-          updatePreview(true);
-
           setInterval(function(){
 
             x = Math.round(joystick.deltaX());
@@ -159,120 +145,6 @@
         }
         socket.emit('control', JSON.stringify(message));
       });
-
-      function reload_img () {
-          if(!halted) 
-          {
-              $mjpeg_left_img[0].src = ip_left+"/cam_pic.php?time=" + new Date().getTime() + "&pDelay=" + preview_delay;
-          }
-          else 
-          {
-              setTimeout("reload_img()", 500);
-          }
-      }
-
-      function error_img () {
-          setTimeout("mjpeg_left_img.src = "+ip_left+"'/cam_pic.php?time=' + new Date().getTime();", 100);
-      }
-
-      function updatePreview(cycle)
-      {
-          if (cycle !== undefined && cycle == true)
-          {
-              $mjpeg_left_img[0].src = ip_left+"/updating.jpg";
-              setTimeout("$mjpeg_left_img[0].src = \" " + ip_left + "/cam_pic_new.php?time=\" + new Date().getTime()  + \"&pDelay=\" + preview_delay;", 1000);
-              return;
-          }
-        
-          if (previous_halted != halted)
-          {
-              if(!halted)
-              {
-                  $mjpeg_left_img[0].src = ip_left+"/cam_pic.php?time=" + new Date().getTime() + "&pDelay=" + preview_delay;
-              }
-              else
-              {
-                  $mjpeg_left_img[0].src = ip_left+"/updating.jpg";
-              }
-          }
-          previous_halted = halted;
-
-      }
-    //
-    // MJPEG
-    //
-    /*
-    var socket = io();
-    var sampletime = 10;
-    var qctrl = 0;
-    var qvrc  = 0;
-
-    $(function() {
-        window.addEventListener('deviceorientation', function(event) 
-        {
-            var alpha = event.alpha;
-            var beta  = event.beta;
-            var gamma = event.gamma;
-
-            xhtml = document.getElementById('x');
-            yhtml = document.getElementById('y');
-             
-            
-            a = document.getElementById('alpha');
-            b = document.getElementById('beta');
-            g = document.getElementById('gamma');
-            x = Math.round(beta);
-            y = Math.round(gamma);
-            if (Math.abs(x)>4 || Math.abs(y)>4 )
-            {
-                xhtml.innerHTML = Math.round(x);
-                yhtml.innerHTML = Math.round(y);
-
-                var message = {
-                    x: x,
-                    y: y,
-                }
-                socket.emit('control', JSON.stringify(message));
-
-                setTimeout(function(){}, sampletime);  
-            }
-            setTimeout(function(){}, sampletime);
-            a.innerHTML = Math.round(alpha);
-            b.innerHTML = Math.round(beta);
-            g.innerHTML = Math.round(gamma);
-
-
-        }, false);
-
-        $('#ctrl').on("click", function( event )
-        {
-          if (qctrl==0) 
-          {
-
-            qctrl = 1;
-          }
-          else          
-          {
-
-            qctrl = 0;
-          }
-        });
-
-        $('#qvrc').on("click", function( event )
-        {
-          if (qvrc==0) 
-          {
-
-            qvrc = 1;
-          }
-          else         
-          {
-
-            qvrc = 0;
-          }
-        });
-
-      });*/
     </script>
   </body>
 </html>
