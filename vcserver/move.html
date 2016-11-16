@@ -10,7 +10,7 @@
     <script src="http://jeromeetienne.github.io/threex.keyboardstate/threex.keyboardstate.js"></script>
     <script src="/virtualjoystick.js"></script>
 
-    <div id="container" style="height:800px;width:600px;background-color:#AAA">
+    <div id="container" style="height:600px;width:800px;background-color:#AAA">
     </div>
 
     <div id="init_control_ui" style="margin-top:10px">
@@ -108,9 +108,6 @@
         }
         else if (ctrlv==false && vrcv == true) // use joy stick to control the VR only.
         {
-          reload_img();
-          updatePreview(true);
-
           setInterval(function(){
 
             x = Math.round(joystick.deltaX());
