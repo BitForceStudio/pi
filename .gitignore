@@ -2,6 +2,7 @@
 /.pydevproject
 /.pyc
 /.sqlite3
+/.env
 
 *.jpg
 
