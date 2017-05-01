@@ -1,4 +1,10 @@
 # covert circular image to rectangle
+# image info: 1990*1990 center need to be set manuely
+# since settled, everything will be fixed for the next time
+# after initial, the config file will be generated, in formation of 
+# crop location
+# matrix size
+# pairs of x and y 
 
 import sys, getopt
 import cv2
@@ -75,25 +81,39 @@ def buildCleanMap(w,h,fov):
     return map_x, map_y
 
 
-def unwarp(img,xmap,ymap):
+def unwarp(img,xmap,ymap,name):
     rst=cv2.remap(img,xmap,ymap,cv2.INTER_LINEAR)
-    cv2.imwrite('result.png',rst)
+    cv2.imwrite(name,rst)
+    return rst
 
+
+def crop(img,left,top,w,h):
+    crop_img = img[top:top+h, left:left+w] 
+    # Crop from x, y, w, h
+    # NOTE: its img[y: y + h, x: x + w]
+    #cv2.waitKey(0)
+    return crop_img
 
 def main():
-    inputfile = 'test1.jpg'
+    front_file = 'fr_ori.jpg'
+    back_file  = 'bk_ori.jpg'
+    # crop the images from the original image
+
+
     start = timeit.default_timer()
 
-    print('Input file is: ', inputfile)
+    print('Front file is: ', front_file)
+    print('Back file is: ' , back_file)
 
-    img = cv2.imread(inputfile,0)
+    fr_img = cv2.imread(front_file,0)
+    bk_img = cv2.imread(back_file ,0)
 
-    height, width = img.shape
+    w=1970
+    h=1970
+    fr_img = crop(fr_img,237,74,w,w)
+    bk_img = crop(bk_img,352,29,w,w)
 
-    w = width
-    h = height
-
-    print("image size: %d*%d pixels " % (width,height))
+    print("cropped image size: %d*%d pixels " % (w,h))
 
     fov = 220.0
 
@@ -105,10 +125,17 @@ def main():
 
     # do our dewarping and save/show the results
 
-    unwarp(img,mapx,mapy)
+    fr_timg = unwarp(fr_img,mapx,mapy,'fr_pano.png')
+    bk_timg = unwarp(bk_img,mapx,mapy,'bc_pano.png')
 
     stop = timeit.default_timer()
     print("Finished cost %d sec" % (stop-start))
+
+    fr_timg = crop(fr_timg,766,0,2408,1970)
+    bk_timg = crop(bk_timg,766,0,2408,1970)
+
+    cv2.imwrite("fr_180.png",fr_timg)
+    cv2.imwrite("bk_180.png",bk_timg)
 
 if __name__ == "__main__":
    main()
