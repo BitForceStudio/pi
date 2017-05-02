@@ -1,0 +1,7 @@
+install list
+
+1: virtualenv
+
+2: opencv-python
+
+3: opencv-contrib-python

@@ -63,7 +63,7 @@ def buildCleanMap(w,h,fov):
             a_phi   = np.arctan(np.sqrt(spx*spx+spz*spz)/(spy+0.00000000001))
             r=w*a_phi/vfov
             if spy<0:
-                r=w*180/220-abs(r)
+                r=w*180/fov-abs(r)
 
             if spx<0:
                 xS = int(0.5*w-r*np.cos(a_theta))
@@ -94,6 +94,17 @@ def crop(img,left,top,w,h):
     #cv2.waitKey(0)
     return crop_img
 
+def smoothBound(img1, img2, dir):
+    w,h = img1.shape[:2]
+    rst = img1
+    for i in range(0,h):
+        for j in range(0,w):
+            weight = 0.5*(np.cos(float(i)/float(h)*np.pi)+1)
+            if dir==1:
+                weight = 1- weight
+            rst[j,i] = weight*img1[j,i]+(1.0-weight)*img2[j,i]
+
+    return rst
 def main():
     front_file = 'fr_ori.jpg'
     back_file  = 'bk_ori.jpg'
@@ -113,9 +124,12 @@ def main():
     fr_img = crop(fr_img,237,74,w,w)
     bk_img = crop(bk_img,352,29,w,w)
 
+    cv2.imwrite("fr_crop.png",fr_img)
+    cv2.imwrite("bk_crop.png",bk_img)
+
     print("cropped image size: %d*%d pixels " % (w,h))
 
-    fov = 220.0
+    fov = 199
 
     mapstart = timeit.default_timer()
     mapx,mapy = buildMap(w,h,fov,False)
@@ -130,12 +144,30 @@ def main():
 
     stop = timeit.default_timer()
     print("Finished cost %d sec" % (stop-start))
+    delta = 75 
+    fr_ttimg = crop(fr_timg,int(w/2)+delta,0,w-2*delta,h)
+    bk_ttimg = crop(bk_timg,int(w/2)+delta,0,w-2*delta,h)
 
-    fr_timg = crop(fr_timg,766,0,2408,1970)
-    bk_timg = crop(bk_timg,766,0,2408,1970)
+    fr_mid = crop(fr_timg,int(w/2)+w-delta,0,2*delta,h)
+    bk_mid = crop(bk_timg,int(w/2)-delta  ,0,2*delta,h)
 
-    cv2.imwrite("fr_180.png",fr_timg)
-    cv2.imwrite("bk_180.png",bk_timg)
+    fr_far = crop(fr_timg,int(w/2)-delta,0,2*delta,h)
+    bk_far = crop(bk_timg,int(w/2)+w-delta,0,2*delta,h)
+
+    pano_mid = smoothBound(fr_mid,bk_mid,0)
+    pano_far = smoothBound(fr_far,bk_far,1)
+
+    fr_far = crop(pano_far,delta,0,delta,h)
+    bk_far = crop(pano_far,0,0,delta,h)
+
+    cv2.imwrite("fr_180.png",fr_ttimg)
+    cv2.imwrite("bk_180.png",bk_ttimg)
+
+    vis = np.concatenate((fr_far, fr_ttimg), axis=1)
+    vis = np.concatenate((vis, pano_mid), axis=1)
+    vis = np.concatenate((vis, bk_ttimg), axis=1)
+    vis = np.concatenate((vis, bk_far), axis=1)
+    cv2.imwrite("pano.png",vis)
 
 if __name__ == "__main__":
    main()
