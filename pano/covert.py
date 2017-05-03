@@ -163,10 +163,10 @@ def main():
     cv2.imwrite("fr_180.png",fr_ttimg)
     cv2.imwrite("bk_180.png",bk_ttimg)
 
-    vis = np.concatenate((fr_far, fr_ttimg), axis=1)
-    vis = np.concatenate((vis, pano_mid), axis=1)
-    vis = np.concatenate((vis, bk_ttimg), axis=1)
-    vis = np.concatenate((vis, bk_far), axis=1)
+    vis = np.concatenate((fr_far, fr_ttimg, pano_mid, bk_ttimg, bk_far), axis=1)
+    #vis = np.concatenate((vis, pano_mid), axis=1)
+    #vis = np.concatenate((vis, bk_ttimg), axis=1)
+    #vis = np.concatenate((vis, bk_far), axis=1)
     cv2.imwrite("pano.png",vis)
 
 if __name__ == "__main__":
