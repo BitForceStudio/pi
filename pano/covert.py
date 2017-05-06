@@ -12,6 +12,7 @@ import numpy as np
 import time, os
 from pathlib import Path
 import timeit
+import json
 
 def buildMap1(w,h,fov,qbmap):
     # Build the fisheye mapping
@@ -43,33 +44,35 @@ def buildMap1(w,h,fov,qbmap):
 def buildMap(w,h,fov,qbmap):
     # Build the fisheye mapping
     # read the map (map should be generated once)
-    map_file = Path("defish.mat")
+    map_file = Path("defish.json")
     map_x = np.zeros((h,w*2),np.float32)
     map_y = np.zeros((h,w*2),np.float32)
 
     if not map_file.is_file() or qbmap:
-        map_x,map_y = buildCleanMap(w,h,fov)
+        map_x,map_y = buildJsonMap(w,h,fov)
     else:
-        f = open('defish.mat','r')
-        size=int(f.readline())
-        if (size!=h*w*2):
-            map_x,map_y = buildCleanMap(w,h,fov)
-        else:
-            map_x,map_y = readMap(f,h,w)
-        f.close()
+        with open('defish.json') as json_data:
+            jsonMap = json.load(json_data)
+            mapSize = jsonMap["SIZE"]
+            if (mapSize!=h*w*2):
+                map_x,map_y = buildJsonMap(w,h,fov)
+            else:
+                map_x,map_y = readJsonMap(w,h,jsonMap)
+
     return map_x, map_y
     
-def readMap(f,h,w):
+def readJsonMap(w,h,jsonMap):
     print("Reading map...")
+    mx = jsonMap["MX"]
+    my = jsonMap["MY"]
     map_x = np.zeros((h,w*2),np.float32)
     map_y = np.zeros((h,w*2),np.float32)
-
+    counter = 0
     for y in range(0,int(h)):
         for x in range(0,int(w*2)):
-            line =f.readline();
-            strnum = line.split(" ")
-            map_x.itemset((y,x),int(strnum[0]))
-            map_y.itemset((y,x),int(strnum[1]))
+            map_x.itemset((y,x),mx[counter])
+            map_y.itemset((y,x),my[counter])
+            counter=counter+1
 
     return map_x, map_y
 
@@ -85,14 +88,15 @@ def buildCleanMap(w,h,fov):
     # http://paulbourke.net/dome/fish2/
 
     for y in range(0,int(h)):
+        phi    = np.pi*(float(y)/float(h)-0.5)
+        cosPhi = np.cos(phi)
+        spz    = np.sin(phi)
         for x in range(0,int(w*2)):
 
             theta = np.pi*(float(x)/float(w)-1)
-            phi   = np.pi*(float(y)/float(h)-0.5)
 
-            spx=np.cos(phi)*np.sin(theta);
-            spy=np.cos(phi)*np.cos(theta);
-            spz=np.sin(phi)
+            spx=cosPhi*np.sin(theta);
+            spy=cosPhi*np.cos(theta);
 
             a_theta = np.arctan(spz/(spx+0.00000000001))
             a_phi   = np.arctan(np.sqrt(spx*spx+spz*spz)/(spy+0.00000000001))
@@ -114,6 +118,57 @@ def buildCleanMap(w,h,fov):
             f.write(line)
 
     return map_x, map_y
+
+def buildJsonMap(w,h,fov):
+    print("Building map in Json formation")
+
+    map_x = np.zeros((h,w*2),np.float32)
+    map_y = np.zeros((h,w*2),np.float32)
+    vfov=fov/180*np.pi
+
+    imgObj = {"SIZE":2*w*h}
+    imgMapX = []
+    imgMapY = []
+    
+    for y in range(0,int(h)):
+        phi    = np.pi*(float(y)/float(h)-0.5)
+        cosPhi = np.cos(phi)
+        spz    = np.sin(phi)
+
+        for x in range(0,int(w*2)):
+
+            theta = np.pi*(float(x)/float(w)-1)
+            spx   =cosPhi*np.sin(theta);
+            spy   =cosPhi*np.cos(theta);
+
+            a_theta = np.arctan(spz/(spx+0.00000000001))
+            a_phi   = np.arctan(np.sqrt(spx*spx+spz*spz)/(spy+0.00000000001))
+            r=w*a_phi/vfov
+
+            if spy<0:
+                r=w*180/fov-abs(r)
+
+            if spx<0:
+                xS = int(0.5*w-r*np.cos(a_theta))
+                yS = int(0.5*w-r*np.sin(a_theta))
+            else:
+                xS = int(0.5*w+r*np.cos(a_theta))
+                yS = int(0.5*w+r*np.sin(a_theta))
+
+            map_x.itemset((y,x),xS)
+            map_y.itemset((y,x),yS)
+
+            imgMapX.append(xS)
+            imgMapY.append(yS)
+    
+    imgObj["MX"]=imgMapX
+    imgObj["MY"]=imgMapY
+
+    with open('defish.json', 'w') as outfile:
+        json.dump(imgObj, outfile)
+
+    return map_x, map_y
+    
 
 
 def unwarp(img,xmap,ymap,name):
@@ -143,8 +198,6 @@ def smoothBound(img1, img2, dir):
 def main():
     front_file = 'fr_ori.jpg'
     back_file  = 'bk_ori.jpg'
-    # crop the images from the original image
-
 
     start = timeit.default_timer()
 
@@ -199,7 +252,7 @@ def main():
     vis = np.concatenate((fr_far, fr_ttimg, pano_mid, bk_ttimg, bk_far), axis=1)
 
     cv2.imwrite("pano.png",vis)
-    
+
     stop = timeit.default_timer()
     print("Finished cost %d sec" % (stop-start))
 if __name__ == "__main__":

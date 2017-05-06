@@ -125,6 +125,9 @@ def buildCleanMap(w,h,fov):
 
     return map_x, map_y
 
+def buildJsonMap(w,h,fov):
+    
+
 
 def unwarp(img,xmap,ymap,name):
     rst=cv2.remap(img,xmap,ymap,cv2.INTER_LINEAR)
