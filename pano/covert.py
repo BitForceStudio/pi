@@ -195,6 +195,7 @@ def smoothBound(img1, img2, dir):
             rst[j,i] = weight*img1[j,i]+(1.0-weight)*img2[j,i]
 
     return rst
+    
 def main():
     front_file = 'fr_ori.jpg'
     back_file  = 'bk_ori.jpg'
