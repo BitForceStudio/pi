@@ -13,29 +13,64 @@ import time, os
 from pathlib import Path
 import timeit
 
-def buildMap(w,h,fov,qbmap):
+def buildMap1(w,h,fov,qbmap):
     # Build the fisheye mapping
     # read the map (map should be generated once)
-    map_file = Path("map.m")
+    map_file = Path("defish.mat")
     map_x = np.zeros((h,w*2),np.float32)
     map_y = np.zeros((h,w*2),np.float32)
 
     if not map_file.is_file() or qbmap:
         map_x,map_y = buildCleanMap(w,h,fov)
     else:
-        f = open('map.m','r')
+        f = open('defish.mat','r')
         size=int(f.readline())
         if (size!=h*w*2):
             map_x,map_y = buildCleanMap(w,h,fov)
         else:
             print("Reading map")
+            counter = 0
             for y in range(0,int(h)):
                 for x in range(0,int(w*2)):
                     line =f.readline();
                     strnum = line.split(" ")
                     map_x.itemset((y,x),int(strnum[0]))
                     map_y.itemset((y,x),int(strnum[1]))
+                    counter=counter+1
         f.close()
+    return map_x, map_y
+
+def buildMap(w,h,fov,qbmap):
+    # Build the fisheye mapping
+    # read the map (map should be generated once)
+    map_file = Path("defish.mat")
+    map_x = np.zeros((h,w*2),np.float32)
+    map_y = np.zeros((h,w*2),np.float32)
+
+    if not map_file.is_file() or qbmap:
+        map_x,map_y = buildCleanMap(w,h,fov)
+    else:
+        f = open('defish.mat','r')
+        size=int(f.readline())
+        if (size!=h*w*2):
+            map_x,map_y = buildCleanMap(w,h,fov)
+        else:
+            map_x,map_y = readMap(f,h,w)
+        f.close()
+    return map_x, map_y
+    
+def readMap(f,h,w):
+    print("Reading map...")
+    map_x = np.zeros((h,w*2),np.float32)
+    map_y = np.zeros((h,w*2),np.float32)
+
+    for y in range(0,int(h)):
+        for x in range(0,int(w*2)):
+            line =f.readline();
+            strnum = line.split(" ")
+            map_x.itemset((y,x),int(strnum[0]))
+            map_y.itemset((y,x),int(strnum[1]))
+
     return map_x, map_y
 
 def buildCleanMap(w,h,fov):
@@ -45,7 +80,7 @@ def buildCleanMap(w,h,fov):
     map_y = np.zeros((h,w*2),np.float32)
     vfov=fov/180*np.pi
 
-    f = open('map.m','w')
+    f = open('defish.mat','w')
     f.write(str(h*w*2)+'\n')
     # http://paulbourke.net/dome/fish2/
 
@@ -116,8 +151,8 @@ def main():
     print('Front file is: ', front_file)
     print('Back file is: ' , back_file)
 
-    fr_img = cv2.imread(front_file,0)
-    bk_img = cv2.imread(back_file ,0)
+    fr_img = cv2.imread(front_file,cv2.IMREAD_COLOR)
+    bk_img = cv2.imread(back_file ,cv2.IMREAD_COLOR)
 
     w=1970
     h=1970
@@ -142,8 +177,6 @@ def main():
     fr_timg = unwarp(fr_img,mapx,mapy,'fr_pano.png')
     bk_timg = unwarp(bk_img,mapx,mapy,'bc_pano.png')
 
-    stop = timeit.default_timer()
-    print("Finished cost %d sec" % (stop-start))
     delta = 75 
     fr_ttimg = crop(fr_timg,int(w/2)+delta,0,w-2*delta,h)
     bk_ttimg = crop(bk_timg,int(w/2)+delta,0,w-2*delta,h)
@@ -164,10 +197,10 @@ def main():
     cv2.imwrite("bk_180.png",bk_ttimg)
 
     vis = np.concatenate((fr_far, fr_ttimg, pano_mid, bk_ttimg, bk_far), axis=1)
-    #vis = np.concatenate((vis, pano_mid), axis=1)
-    #vis = np.concatenate((vis, bk_ttimg), axis=1)
-    #vis = np.concatenate((vis, bk_far), axis=1)
-    cv2.imwrite("pano.png",vis)
 
+    cv2.imwrite("pano.png",vis)
+    
+    stop = timeit.default_timer()
+    print("Finished cost %d sec" % (stop-start))
 if __name__ == "__main__":
    main()
