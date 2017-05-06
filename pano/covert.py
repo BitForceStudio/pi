@@ -14,32 +14,6 @@ from pathlib import Path
 import timeit
 import json
 
-def buildMap1(w,h,fov,qbmap):
-    # Build the fisheye mapping
-    # read the map (map should be generated once)
-    map_file = Path("defish.mat")
-    map_x = np.zeros((h,w*2),np.float32)
-    map_y = np.zeros((h,w*2),np.float32)
-
-    if not map_file.is_file() or qbmap:
-        map_x,map_y = buildCleanMap(w,h,fov)
-    else:
-        f = open('defish.mat','r')
-        size=int(f.readline())
-        if (size!=h*w*2):
-            map_x,map_y = buildCleanMap(w,h,fov)
-        else:
-            print("Reading map")
-            counter = 0
-            for y in range(0,int(h)):
-                for x in range(0,int(w*2)):
-                    line =f.readline();
-                    strnum = line.split(" ")
-                    map_x.itemset((y,x),int(strnum[0]))
-                    map_y.itemset((y,x),int(strnum[1]))
-                    counter=counter+1
-        f.close()
-    return map_x, map_y
 
 def buildMap(w,h,fov,qbmap):
     # Build the fisheye mapping
@@ -76,51 +50,8 @@ def readJsonMap(w,h,jsonMap):
 
     return map_x, map_y
 
-def buildCleanMap(w,h,fov):
-    print("Building map...")
-
-    map_x = np.zeros((h,w*2),np.float32)
-    map_y = np.zeros((h,w*2),np.float32)
-    vfov=fov/180*np.pi
-
-    f = open('defish.mat','w')
-    f.write(str(h*w*2)+'\n')
-    # http://paulbourke.net/dome/fish2/
-
-    for y in range(0,int(h)):
-        phi    = np.pi*(float(y)/float(h)-0.5)
-        cosPhi = np.cos(phi)
-        spz    = np.sin(phi)
-        for x in range(0,int(w*2)):
-
-            theta = np.pi*(float(x)/float(w)-1)
-
-            spx=cosPhi*np.sin(theta);
-            spy=cosPhi*np.cos(theta);
-
-            a_theta = np.arctan(spz/(spx+0.00000000001))
-            a_phi   = np.arctan(np.sqrt(spx*spx+spz*spz)/(spy+0.00000000001))
-            r=w*a_phi/vfov
-            if spy<0:
-                r=w*180/fov-abs(r)
-
-            if spx<0:
-                xS = int(0.5*w-r*np.cos(a_theta))
-                yS = int(0.5*w-r*np.sin(a_theta))
-            else:
-                xS = int(0.5*w+r*np.cos(a_theta))
-                yS = int(0.5*w+r*np.sin(a_theta))
-
-            map_x.itemset((y,x),xS)
-            map_y.itemset((y,x),yS)
-
-            line = str(xS)+" "+str(yS)+'\n'
-            f.write(line)
-
-    return map_x, map_y
-
 def buildJsonMap(w,h,fov):
-    print("Building map in Json formation")
+    print("Building map...")
 
     map_x = np.zeros((h,w*2),np.float32)
     map_y = np.zeros((h,w*2),np.float32)
@@ -195,7 +126,7 @@ def smoothBound(img1, img2, dir):
             rst[j,i] = weight*img1[j,i]+(1.0-weight)*img2[j,i]
 
     return rst
-    
+
 def main():
     front_file = 'fr_ori.jpg'
     back_file  = 'bk_ori.jpg'
@@ -210,15 +141,30 @@ def main():
 
     w=1970
     h=1970
-    fr_img = crop(fr_img,237,74,w,w)
-    bk_img = crop(bk_img,352,29,w,w)
+    ml = 237
+    mt = 74
+    sl = 352
+    st = 29
+    fov = 199
+    
+    with open('fisheyelens.conf') as json_data:
+        print("Reading config from file...")
+        jsonConf = json.load(json_data)
+        w=jsonConf["SIZE"]
+        h=jsonConf["SIZE"]
+        ml=jsonConf["MLEFT"]
+        mt=jsonConf["MTOP"]
+        sl=jsonConf["SLEFT"]
+        st=jsonConf["STOP"]
+        fov=jsonConf["FOV"]
+
+    fr_img = crop(fr_img,ml,mt,w,w)
+    bk_img = crop(bk_img,sl,st,w,w)
 
     cv2.imwrite("fr_crop.png",fr_img)
     cv2.imwrite("bk_crop.png",bk_img)
 
     print("cropped image size: %d*%d pixels " % (w,h))
-
-    fov = 199
 
     mapstart = timeit.default_timer()
     mapx,mapy = buildMap(w,h,fov,False)
