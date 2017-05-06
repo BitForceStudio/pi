@@ -14,6 +14,7 @@ from pathlib import Path
 import timeit
 import json
 
+_debug=1
 
 def buildMap(w,h,fov,qbmap):
     # Build the fisheye mapping
@@ -36,7 +37,8 @@ def buildMap(w,h,fov,qbmap):
     return map_x, map_y
     
 def readJsonMap(w,h,jsonMap):
-    print("Reading map...")
+    if _debug>=1:
+        print("Reading map...")
     mx = jsonMap["MX"]
     my = jsonMap["MY"]
     map_x = np.zeros((h,w*2),np.float32)
@@ -51,7 +53,8 @@ def readJsonMap(w,h,jsonMap):
     return map_x, map_y
 
 def buildJsonMap(w,h,fov):
-    print("Building map...")
+    if _debug>=1:
+        print("Building map...")
 
     map_x = np.zeros((h,w*2),np.float32)
     map_y = np.zeros((h,w*2),np.float32)
@@ -80,11 +83,10 @@ def buildJsonMap(w,h,fov):
                 r=w*180/fov-abs(r)
 
             if spx<0:
-                xS = int(0.5*w-r*np.cos(a_theta))
-                yS = int(0.5*w-r*np.sin(a_theta))
-            else:
-                xS = int(0.5*w+r*np.cos(a_theta))
-                yS = int(0.5*w+r*np.sin(a_theta))
+                r=-r
+
+            xS = int(0.5*w+r*np.cos(a_theta))
+            yS = int(0.5*w+r*np.sin(a_theta))
 
             map_x.itemset((y,x),xS)
             map_y.itemset((y,x),yS)
@@ -104,7 +106,8 @@ def buildJsonMap(w,h,fov):
 
 def unwarp(img,xmap,ymap,name):
     rst=cv2.remap(img,xmap,ymap,cv2.INTER_LINEAR)
-    cv2.imwrite(name,rst)
+    if _debug>=2:
+        cv2.imwrite(name,rst)
     return rst
 
 
@@ -115,29 +118,36 @@ def crop(img,left,top,w,h):
     #cv2.waitKey(0)
     return crop_img
 
-def smoothBound(img1, img2, dir):
-    w,h = img1.shape[:2]
-    rst = img1
-    for i in range(0,h):
-        for j in range(0,w):
-            weight = 0.5*(np.cos(float(i)/float(h)*np.pi)+1)
-            if dir==1:
-                weight = 1- weight
-            rst[j,i] = weight*img1[j,i]+(1.0-weight)*img2[j,i]
+def smoothBound(img1, img2, w, h, delta):
+    img1pi = img1[0:h, int(0.5*w):int(1.5*w)] 
+    img2pi = img2[0:h, int(0.5*w):int(1.5*w)] 
+    rst = np.concatenate((img1pi, img2pi), axis=1)
+    # image matrix: height * width
+    for j in range(w-delta,w+delta):
+        weight = 1-0.5*(np.sin(float(j-w)/float(delta)*np.pi/2.0)+1)
+        for i in range(0,h):
+            #  img1 X img2
+            rst[i,j] = weight*img1[i,j+int(0.5*w)]+(1.0-weight)*img2[i,j-int(0.5*w)]
+            #  img2 X img1
+            t = j-w
+            if j<w:
+                t=j+w
+            rst[i,t] = (1.0-weight)*img1[i,j-int(0.5*w)]+weight*img2[i,j+int(0.5*w)]
 
     return rst
 
 def main():
-    front_file = 'fr_ori.jpg'
-    back_file  = 'bk_ori.jpg'
+    master_file = 'fr_ori.jpg'
+    slave_file  = 'bk_ori.jpg'
 
     start = timeit.default_timer()
 
-    print('Front file is: ', front_file)
-    print('Back file is: ' , back_file)
+    if _debug>=1:
+        print('Front file is: ', master_file)
+        print('Back file is: ' , slave_file)
 
-    fr_img = cv2.imread(front_file,cv2.IMREAD_COLOR)
-    bk_img = cv2.imread(back_file ,cv2.IMREAD_COLOR)
+    master_img = cv2.imread(master_file,cv2.IMREAD_COLOR)
+    slave_img = cv2.imread(slave_file ,cv2.IMREAD_COLOR)
 
     w=1970
     h=1970
@@ -146,61 +156,55 @@ def main():
     sl = 352
     st = 29
     fov = 199
+    delta = 75 
     
     with open('fisheyelens.conf') as json_data:
-        print("Reading config from file...")
+        if _debug>=1:
+            print("Reading config from file...")
         jsonConf = json.load(json_data)
-        w=jsonConf["SIZE"]
-        h=jsonConf["SIZE"]
-        ml=jsonConf["MLEFT"]
-        mt=jsonConf["MTOP"]
-        sl=jsonConf["SLEFT"]
-        st=jsonConf["STOP"]
-        fov=jsonConf["FOV"]
+        w    =jsonConf["SIZE"]
+        h    =jsonConf["SIZE"]
+        ml   =jsonConf["MLEFT"]
+        mt   =jsonConf["MTOP"]
+        sl   =jsonConf["SLEFT"]
+        st   =jsonConf["STOP"]
+        fov  =jsonConf["FOV"]
+        delta=jsonConf["DELTA"]
 
-    fr_img = crop(fr_img,ml,mt,w,w)
-    bk_img = crop(bk_img,sl,st,w,w)
+    master_img = crop(master_img,ml,mt,w,w)
+    slave_img = crop(slave_img,sl,st,w,w)
 
-    cv2.imwrite("fr_crop.png",fr_img)
-    cv2.imwrite("bk_crop.png",bk_img)
+    if _debug>=2:
+        cv2.imwrite("fr_crop.png",master_img)
+        cv2.imwrite("bk_crop.png",slave_img)
 
-    print("cropped image size: %d*%d pixels " % (w,h))
+    if _debug>=1:
+        print("cropped image size: %d*%d pixels " % (w,h))
 
     mapstart = timeit.default_timer()
     mapx,mapy = buildMap(w,h,fov,False)
     mapstop = timeit.default_timer()
 
-    print("MAP DONE cost %d sec" % (mapstop-mapstart))
+    if _debug>=1:
+        print("MAP DONE cost %d sec" % (mapstop-mapstart))
 
     # do our dewarping and save/show the results
 
-    fr_timg = unwarp(fr_img,mapx,mapy,'fr_pano.png')
-    bk_timg = unwarp(bk_img,mapx,mapy,'bc_pano.png')
+    oImagestart = timeit.default_timer()
+    master_img = unwarp(master_img,mapx,mapy,'pano_master.png')
+    slave_img = unwarp(slave_img,mapx,mapy,'pano_slave.png')
 
-    delta = 75 
-    fr_ttimg = crop(fr_timg,int(w/2)+delta,0,w-2*delta,h)
-    bk_ttimg = crop(bk_timg,int(w/2)+delta,0,w-2*delta,h)
-
-    fr_mid = crop(fr_timg,int(w/2)+w-delta,0,2*delta,h)
-    bk_mid = crop(bk_timg,int(w/2)-delta  ,0,2*delta,h)
-
-    fr_far = crop(fr_timg,int(w/2)-delta,0,2*delta,h)
-    bk_far = crop(bk_timg,int(w/2)+w-delta,0,2*delta,h)
-
-    pano_mid = smoothBound(fr_mid,bk_mid,0)
-    pano_far = smoothBound(fr_far,bk_far,1)
-
-    fr_far = crop(pano_far,delta,0,delta,h)
-    bk_far = crop(pano_far,0,0,delta,h)
-
-    cv2.imwrite("fr_180.png",fr_ttimg)
-    cv2.imwrite("bk_180.png",bk_ttimg)
-
-    vis = np.concatenate((fr_far, fr_ttimg, pano_mid, bk_ttimg, bk_far), axis=1)
+    vis = smoothBound(master_img,slave_img,w,h,delta)
 
     cv2.imwrite("pano.png",vis)
-
+    oImagestop = timeit.default_timer()
     stop = timeit.default_timer()
-    print("Finished cost %d sec" % (stop-start))
+
+    if _debug>=1:
+        print("Output Image DONE cost %d sec" % (oImagestop-oImagestart))
+
+    if _debug>=1:
+        print("Finished cost %d sec" % (stop-start))
+
 if __name__ == "__main__":
    main()
