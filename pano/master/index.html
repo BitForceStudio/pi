@@ -1,0 +1,103 @@
+<!doctype html>
+<html>
+  <head>
+    <title>nodejs control</title>
+  </head>
+  <body>
+    <div><img id="mjpeg_left" onclick="toggle_fullscreen(this);" src="http://raspberrypi.local:80/picam/loading.jpg"></div>
+    <div><img id="mjpeg_right" onclick="toggle_fullscreen(this);" src="http://192.168.1.11:80/picam/loading.jpg"></div>
+    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+    <script type="text/javascript">
+      //
+      // MJPEG
+      //
+      var $mjpeg_left_img=$("#mjpeg_left");
+      var $mjpeg_right_img=$("#mjpeg_right");
+      var ip_left ="http://raspberrypi.local:80/picam";
+      var ip_right="http://192.168.1.11:80/picam";      
+
+      var halted = 0;
+      var previous_halted = 99;
+      var mjpeg_mode = 0;
+      var preview_delay = 0;
+      var sampletime = 10;
+
+      $(function() {
+
+          reload_img();
+          updatePreview(true);
+      });
+
+      function toggle_fullscreen(e) {
+
+          var background = document.getElementById("background");
+
+          if(!background) {
+              background = document.createElement("div");
+              background.id = "background";
+              document.body.appendChild(background);
+          }
+        
+          if(e.className == "fullscreen") {
+              e.className = "";
+              background.style.display = "none";
+          }
+          else {
+              e.className = "fullscreen";
+              background.style.display = "block";
+          }
+
+      }
+
+      function reload_img () {
+          if(!halted) 
+          {
+              //$mjpeg_left_img[0].src  = ip_left +"/cam_pic.php?time=" + new Date().getTime() + "&pDelay=" + preview_delay;
+              $mjpeg_right_img[0].src = ip_right+"/cam_pic.php?time=" + new Date().getTime() + "&pDelay=" + preview_delay;
+          }
+          else 
+          {
+              setTimeout("reload_img()", 500);
+          }
+      }
+
+      function error_img () {
+          //setTimeout("mjpeg_left_img.src = "+ip_left +"'/cam_pic.php?time=' + new Date().getTime();", 100);
+          setTimeout("mjpeg_right_img.src= "+ip_right+"'/cam_pic.php?time=' + new Date().getTime();", 100);
+      }
+
+      function updatePreview(cycle)
+      {
+          if (cycle !== undefined && cycle == true)
+          {
+              //$mjpeg_left_img[0].src = ip_left+"/updating.jpg";
+              $mjpeg_right_img[0].src= ip_right+"/updating.jpg";
+              //setTimeout("$mjpeg_left_img[0].src = \" " + ip_left + "/cam_pic_new.php?time=\" + new Date().getTime()  + \"&pDelay=\" + preview_delay;", 1000);
+              setTimeout("$mjpeg_right_img[0].src= \" " + ip_right+ "/cam_pic_new.php?time=\" + new Date().getTime()  + \"&pDelay=\" + preview_delay;", 1000);
+              return;
+          }
+        
+          if (previous_halted != halted)
+          {
+              if(!halted)
+              {
+                  //$mjpeg_left_img[0].src = ip_left +"/cam_pic.php?time=" + new Date().getTime() + "&pDelay=" + preview_delay;
+                  $mjpeg_right_img[0].src= ip_right+"/cam_pic.php?time=" + new Date().getTime() + "&pDelay=" + preview_delay;
+              }
+              else
+              {
+                  //$mjpeg_left_img[0].src = ip_left+"/updating.jpg";
+                  $mjpeg_right_img[0].src = ip_right+"/updating.jpg";
+              }
+          }
+          previous_halted = halted;
+
+      }
+
+
+
+
+
+    </script>
+  </body>
+</html>
