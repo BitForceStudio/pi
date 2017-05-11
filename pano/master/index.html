@@ -20,6 +20,7 @@
       var previous_halted = 99;
       var mjpeg_mode = 0;
       var preview_delay = 0;
+      var preview_delay_slave = 100;
       var sampletime = 10;
 
       $(function() {
@@ -64,8 +65,7 @@
       function reload_slave_img(){
           if(!halted) 
           {
-              $mjpeg_left_img[0].src  = ip_left +"/cam_slave_pic.php?time=" + new Date().getTime() + "&pDelay=" + preview_delay*10;
-              //$mjpeg_right_img[0].src = ip_right+"/cam_pic.php?time=" + new Date().getTime() + "&pDelay=" + preview_delay;
+              $mjpeg_left_img[0].src  = ip_left +"/cam_slave_pic.php?time=" + new Date().getTime() + "&pDelay=" + preview_delay_slave;
           }
           else 
           {
@@ -75,7 +75,7 @@
 
       function error_img () {
           setTimeout("mjpeg_left_img.src = "+ip_left +"'/cam_slave_pic.php?time=' + new Date().getTime();", 100);
-          setTimeout("mjpeg_right_img.src= "+ip_right+"'/cam_pic.php?time=' + new Date().getTime();", 100);
+          setTimeout("mjpeg_right_img.src= "+ip_right+"'/cam_pic.php?time=' + new Date().getTime();"      , 100);
       }
 
       function updatePreview(cycle)
@@ -84,8 +84,8 @@
           {
               $mjpeg_left_img[0].src = ip_right+"/updating.jpg";
               $mjpeg_right_img[0].src= ip_right+"/updating.jpg";
-              setTimeout("$mjpeg_left_img[0].src = \" " + ip_left + "/cam_slave_pic_new.php?time=\" + new Date().getTime()  + \"&pDelay=\" + preview_delay;", 1000);
-              setTimeout("$mjpeg_right_img[0].src= \" " + ip_right+ "/cam_pic_new.php?time=\" + new Date().getTime()  + \"&pDelay=\" + preview_delay;", 1000);
+              setTimeout("$mjpeg_left_img[0].src = \" " + ip_left + "/cam_slave_pic_new.php?time=\" + new Date().getTime()  + \"&pDelay=\" + preview_delay_slave;", 1000);
+              setTimeout("$mjpeg_right_img[0].src= \" " + ip_right+ "/cam_pic_new.php?time=\" + new Date().getTime()  + \"&pDelay=\" + preview_delay;"            , 1000);
               return;
           }
         
@@ -93,8 +93,8 @@
           {
               if(!halted)
               {
-                  $mjpeg_left_img[0].src = ip_left +"/cam_slave_pic.php?time=" + new Date().getTime() + "&pDelay=" + 10*preview_delay;
-                  $mjpeg_right_img[0].src= ip_right+"/cam_pic.php?time=" + new Date().getTime() + "&pDelay=" + preview_delay;
+                  $mjpeg_left_img[0].src = ip_left +"/cam_slave_pic.php?time=" + new Date().getTime() + "&pDelay=" + preview_delay_slave;
+                  $mjpeg_right_img[0].src= ip_right+"/cam_pic.php?time="       + new Date().getTime() + "&pDelay=" + preview_delay;
               }
               else
               {

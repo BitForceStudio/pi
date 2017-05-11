@@ -35,7 +35,7 @@ while(true)
 	echo "--$boundary\r\n";
 	echo "Content-type: image/jpeg\r\n";
         
-        file_put_contents('/var/www/picam/slave/s_cam.jpg',file_get_contents('http://raspberrypi.local/picam/cam.jpg'));	
+    file_put_contents('/var/www/picam/slave/s_cam.jpg',file_get_contents('http://raspberrypi.local/picam/cam.jpg'));	
 	$fileContents = file_get_contents("/var/www/picam/slave/s_cam.jpg");
 	$fileLength = strlen($fileContents);
 	
