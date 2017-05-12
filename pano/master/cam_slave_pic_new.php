@@ -12,6 +12,11 @@ if (isset($_GET["pDelay"]))
       $preview_delay = 10000;
    }
 
+if ($preview_delay<1000)
+{
+  $preview_delay=1000;
+}
+
 //writeLog("mjpeg stream with $preview_delay delay");
 
 // Used to separate multipart
@@ -35,9 +40,10 @@ while(true)
 	echo "--$boundary\r\n";
 	echo "Content-type: image/jpeg\r\n";
         
-    file_put_contents('/var/www/picam/slave/s_cam.jpg',file_get_contents('http://raspberrypi.local/picam/cam.jpg'));	
-	$fileContents = file_get_contents("/var/www/picam/slave/s_cam.jpg");
-	$fileLength = strlen($fileContents);
+        //file_put_contents('/var/www/picam/slave/s_cam.jpg',file_get_contents('http://raspberrypi.local/picam/cam.jpg'));	
+	//$fileContents = file_get_contents("/var/www/picam/slave/s_cam.jpg");
+	$fileContents = file_get_contents("http://raspberrypi.local/picam/cam.jpg");
+        $fileLength = strlen($fileContents);
 	
 	echo "Content-Length:" . $fileLength . "\r\n";
 	echo "\r\n";
@@ -47,5 +53,5 @@ while(true)
 	echo "\r\n";
 	ob_end_flush();
 	
-	usleep($preview_delay);
+	usleep(100000);
 }
