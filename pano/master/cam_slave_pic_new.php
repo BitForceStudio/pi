@@ -9,12 +9,12 @@ if (isset($_GET["pDelay"]))
    {
       $preview_delay = $_GET["pDelay"];
    } else {
-      $preview_delay = 10000;
+      $preview_delay = 50000;
    }
 
-if ($preview_delay<1000)
+if ($preview_delay<50000)
 {
-  $preview_delay=1000;
+  $preview_delay=50000;
 }
 
 //writeLog("mjpeg stream with $preview_delay delay");
@@ -53,5 +53,5 @@ while(true)
 	echo "\r\n";
 	ob_end_flush();
 	
-	usleep(100000);
+	usleep($preview_delay);
 }
