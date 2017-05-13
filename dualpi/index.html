@@ -1,22 +1,14 @@
 <!doctype html>
 <html>
   <head>
-    <title>VR set</title>
+    <title>Dual Camera</title>
   </head>
-  <body>
-    <div>
+  <body style='background-color:black'>
+    <div onclick="toggle_fullscreen(this);">
       <div style='display:inline-block;'><img style='width:475px' id="mjpeg_right" ></div>
       <div style='display:inline-block;'><img style='width:475px;' id="mjpeg_left"></div>
     </div>
 
-    alpha:<span id="alpha"></span><br/>
-    beta:<span id="beta"></span><br/>
-    gamma:<span id="gamma"></span><br/>
-    x:<span id="x"></span><br/>
-    y:<span id="y"></span><br/>
-
-    current alpha <span id="curralpha">-1000</span><br/>
-    <script src="/socket.io/socket.io.js"></script>
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
     <script type="text/javascript">
       //
@@ -31,100 +23,38 @@
       var ip_right="http://"+ip+":80"; 
       $mjpeg_left_img[0].src =ip_left +"/loading.jpg"
       $mjpeg_right_img[0].src=ip_right+"/loading.jpg"
+      
       var halted = 0;
       var previous_halted = 99;
       var mjpeg_mode = 0;
       var preview_delay = 50000;
-      var socket = io();
-      var sampletime = 10;
 
       $(function() {
           
           reload_img();
           reload_slave_img();
           updatePreview(true);
-
-          window.addEventListener('deviceorientation', function(event) 
-          {
-              var a = document.getElementById('alpha');
-              var b = document.getElementById('beta');
-              var g = document.getElementById('gamma');
-              var alpha = event.alpha;
-              var beta  = event.beta;
-              var gamma = event.gamma;
-
-              formalalpha=a.innerHTML;
-              formalbeta=b.innerHTML;
-              formalgamma=g.innerTHML;
-
-              xhtml = document.getElementById('x'),
-              yhtml = document.getElementById('y'),
-              iahtml = document.getElementById('curralpha'),
-
-              formaly=yhtml.innerHTML;
-              formalx=xhtml.innerHTML;
-
-              y=90;
-              if(gamma<0) { y=Math.abs(gamma); }
-              else        { y=180-gamma;       }
-
-              x=90;
-              alphamodified = iahtml.innerHTML;
-
-              if (alphamodified<-500)
-              {
-                  setTimeout(function(){}, 100); 
-                  alpha = event.alpha;
-
-                  if(gamma<0)
-                  {
-                      alpha=alpha+180;
-                      if (alpha>360)
-                      {
-                          alpha=alpha-360;
-                      }
-                  }
-                  iahtml.innerHTML=Math.round(alpha);
-              }
-
-              if(gamma<0)
-              {
-                  alpha=alpha+180;
-                  if (alpha>360)
-                  {
-                      alpha=alpha-360;
-                  }
-              }
-
-              alphacurrent = iahtml.innerHTML;
-              alphachange=Math.round(alpha)-alphacurrent;
-            
-              x = alphachange+90;
-
-              if (Math.abs(x-formalx)>4 || Math.abs(y-formaly)>4 )
-              {
-                  alphadata = Math.round(x);
-                  gammadata = Math.round(y);
-
-                  xhtml.innerHTML = Math.round(x);
-                  yhtml.innerHTML = Math.round(y);
-
-                  var message = {
-                      x: x,
-                      y: gammadata,
-                  }
-                  socket.emit('control', JSON.stringify(message));
-
-                  setTimeout(function(){}, sampletime);  
-              }
-              setTimeout(function(){}, sampletime);
-              a.innerHTML = Math.round(alpha);
-              b.innerHTML = Math.round(beta);
-              g.innerHTML = Math.round(gamma);
-
-
-          }, false);
       });
+
+      function toggle_fullscreen(e) {
+
+          var background = document.getElementById("background");
+
+          if(!background) {
+              background = document.createElement("div");
+              background.id = "background";
+              document.body.appendChild(background);
+          }
+        
+          if(e.className == "fullscreen") {
+              e.className = "";
+              background.style.display = "none";
+          }
+          else {
+              e.className = "fullscreen";
+              background.style.display = "block";
+          }
+      }
 
       function reload_img () {
           if(!halted) 
