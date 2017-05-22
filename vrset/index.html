@@ -104,8 +104,8 @@
               alphachange=Math.round(alpha)-alphacurrent;
             
               x = alphachange+90;
-
-              if (Math.abs(x-formalx)>4 || Math.abs(y-formaly)>4 )
+              if(x<0) x=175;
+              if (Math.abs(x-formalx)>3 || Math.abs(y-formaly)>3 )
               {
                   alphadata = Math.round(x);
                   gammadata = Math.round(y);
