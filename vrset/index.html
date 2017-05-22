@@ -105,6 +105,7 @@
             
               x = alphachange+90;
               if(x<0) x=formalx;
+              if (Math.abs(y-formaly)>100) y=formaly;
               if (Math.abs(x-formalx)>3 || Math.abs(y-formaly)>3 )
               {
                   alphadata = Math.round(x);
