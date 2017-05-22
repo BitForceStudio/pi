@@ -136,6 +136,8 @@ function setOutput (channel, value){
 //---------------------------------------------
 // network
 
+app.use( express.static(__dirname));
+
 app.get('/', function(req, res){
   res.sendfile(__dirname + '/index.html');
 });
