@@ -1,0 +1,4 @@
+php call python function to convert the circled image to pano image
+return image
+
+in js, read the map, and pass it to the php every time we call it.

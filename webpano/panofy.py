@@ -1,7 +1,10 @@
-# convert circular image to rectangle
+# covert circular image to rectangle
+# image info: 1990*1990 center need to be set manuely
 # since settled, everything will be fixed for the next time
-# after initial, the config file will be generated
-# The map will be saved for the next time
+# after initial, the config file will be generated, in formation of 
+# crop location
+# matrix size
+# pairs of x and y 
 
 import sys, getopt
 import cv2
@@ -16,20 +19,16 @@ _debug=2
 def buildMap(w,h,fov,qbmap):
     # Build the fisheye mapping
     # read the map (map should be generated once)
-    map_file = Path("defish.json")
     map_x = np.zeros((h,w*2),np.float32)
     map_y = np.zeros((h,w*2),np.float32)
 
-    if not map_file.is_file() or qbmap:
-        map_x,map_y = buildJsonMap(w,h,fov)
-    else:
-        with open('defish.json') as json_data:
-            jsonMap = json.load(json_data)
-            mapSize = jsonMap["SIZE"]
-            if (mapSize!=h*w*2):
-                map_x,map_y = buildJsonMap(w,h,fov)
-            else:
-                map_x,map_y = readJsonMap(w,h,jsonMap)
+    with open('defish.json') as json_data:
+        jsonMap = json.load(json_data)
+        mapSize = jsonMap["SIZE"]
+        if (mapSize!=h*w*2):
+            exit(1);
+        else:
+            map_x,map_y = readJsonMap(w,h,jsonMap)
 
     return map_x, map_y
     
@@ -48,58 +47,6 @@ def readJsonMap(w,h,jsonMap):
             counter=counter+1
 
     return map_x, map_y
-
-def buildJsonMap(w,h,fov):
-    if _debug>=1:
-        print("Building map...")
-
-    map_x = np.zeros((h,w*2),np.float32)
-    map_y = np.zeros((h,w*2),np.float32)
-    vfov=fov/180*np.pi
-
-    imgObj = {"SIZE":2*w*h}
-    imgMapX = []
-    imgMapY = []
-    
-    for y in range(0,int(h)):
-        phi    = np.pi*(float(y)/float(h)-0.5)
-        cosPhi = np.cos(phi)
-        spz    = np.sin(phi)
-
-        for x in range(0,int(w*2)):
-
-            theta = np.pi*(float(x)/float(w)-1)
-            spx   =cosPhi*np.sin(theta);
-            spy   =cosPhi*np.cos(theta);
-
-            a_theta = np.arctan(spz/(spx+0.00000000001))
-            a_phi   = np.arctan(np.sqrt(spx*spx+spz*spz)/(spy+0.00000000001))
-            r=w*a_phi/vfov
-
-            if spy<0:
-                r=w*180/fov-abs(r)
-
-            if spx<0:
-                r=-r
-
-            xS = int(0.5*w+r*np.cos(a_theta))
-            yS = int(0.5*w+r*np.sin(a_theta))
-
-            map_x.itemset((y,x),xS)
-            map_y.itemset((y,x),yS)
-
-            imgMapX.append(xS)
-            imgMapY.append(yS)
-    
-    imgObj["MX"]=imgMapX
-    imgObj["MY"]=imgMapY
-
-    with open('defish.json', 'w') as outfile:
-        json.dump(imgObj, outfile)
-
-    return map_x, map_y
-    
-
 
 def unwarp(img,xmap,ymap,name):
     rst=cv2.remap(img,xmap,ymap,cv2.INTER_LINEAR)

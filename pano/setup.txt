@@ -4,17 +4,17 @@
 
 	Add the following to /etc/network/interfaces:
 -----------------------------------------interfaces-------------------------------------------------------
-		allow-hotplug usb0
+allow-hotplug usb0
 
-		mapping hotplug
-		        script grep
-		        map usb0
+mapping hotplug
+        script grep
+        map usb0
 
-		iface usb0 inet static
-		       address 192.168.2.14
-		       netmask 255.255.255.0
-		       broadcast 192.168.2.255
-		       up iptables -I INPUT 1 -s 192.168.2.15 -j ACCEPT
+iface usb0 inet static
+       address 192.168.2.14
+       netmask 255.255.255.0
+       broadcast 192.168.2.255
+       up iptables -I INPUT 1 -s 192.168.2.15 -j ACCEPT
 -----------------------------------------interfaces-------------------------------------------------------
 3: reboot master
 4: ping raspberrypi.local, get the ip address (optional, could use raspberrypi.local too)

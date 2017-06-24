@@ -13,27 +13,27 @@ import json
 
 _debug=2
 
-def buildMap(w,h,fov,qbmap):
+def buildVertMap(w,h,fov,qbmap):
     # Build the fisheye mapping
     # read the map (map should be generated once)
-    map_file = Path("defish.json")
+    map_file = Path("json/defishvert.json")
     map_x = np.zeros((h,w*2),np.float32)
     map_y = np.zeros((h,w*2),np.float32)
 
     if not map_file.is_file() or qbmap:
-        map_x,map_y = buildJsonMap(w,h,fov)
+        map_x,map_y = buildVertJsonMap(w,h,fov)
     else:
-        with open('defish.json') as json_data:
+        with open('json/defishvert.json') as json_data:
             jsonMap = json.load(json_data)
             mapSize = jsonMap["SIZE"]
             if (mapSize!=h*w*2):
-                map_x,map_y = buildJsonMap(w,h,fov)
+                map_x,map_y = buildVertJsonMap(w,h,fov)
             else:
-                map_x,map_y = readJsonMap(w,h,jsonMap)
+                map_x,map_y = readVertJsonMap(w,h,jsonMap)
 
     return map_x, map_y
     
-def readJsonMap(w,h,jsonMap):
+def readVertJsonMap(w,h,jsonMap):
     if _debug>=1:
         print("Reading map...")
     mx = jsonMap["MX"]
@@ -49,7 +49,7 @@ def readJsonMap(w,h,jsonMap):
 
     return map_x, map_y
 
-def buildJsonMap(w,h,fov):
+def buildVertJsonMap(w,h,fov):
     if _debug>=1:
         print("Building map...")
 
@@ -60,30 +60,23 @@ def buildJsonMap(w,h,fov):
     imgObj = {"SIZE":2*w*h}
     imgMapX = []
     imgMapY = []
+
+    hfpi = 0.5 * np.pi
     
     for y in range(0,int(h)):
-        phi    = np.pi*(float(y)/float(h)-0.5)
-        cosPhi = np.cos(phi)
-        spz    = np.sin(phi)
+        phi    = np.pi*(float(y)/float(h))
+        sinPhi = np.sin(phi)
 
         for x in range(0,int(w*2)):
 
             theta = np.pi*(float(x)/float(w)-1)
-            spx   =cosPhi*np.sin(theta);
-            spy   =cosPhi*np.cos(theta);
+            r=w*phi/vfov
 
-            a_theta = np.arctan(spz/(spx+0.00000000001))
-            a_phi   = np.arctan(np.sqrt(spx*spx+spz*spz)/(spy+0.00000000001))
-            r=w*a_phi/vfov
-
-            if spy<0:
+            if sinPhi<0:
                 r=w*180/fov-abs(r)
 
-            if spx<0:
-                r=-r
-
-            xS = int(0.5*w+r*np.cos(a_theta))
-            yS = int(0.5*w+r*np.sin(a_theta))
+            xS = int(0.5*w+r*np.cos(theta))
+            yS = int(0.5*w+r*np.sin(theta))
 
             map_x.itemset((y,x),xS)
             map_y.itemset((y,x),yS)
@@ -94,7 +87,7 @@ def buildJsonMap(w,h,fov):
     imgObj["MX"]=imgMapX
     imgObj["MY"]=imgMapY
 
-    with open('defish.json', 'w') as outfile:
+    with open('json/defishvert.json', 'w') as outfile:
         json.dump(imgObj, outfile)
 
     return map_x, map_y
@@ -115,71 +108,34 @@ def crop(img,left,top,w,h):
     #cv2.waitKey(0)
     return crop_img
 
-def smoothBound(img1, img2, w, h, delta):
-    img1pi = img1[0:h, int(0.5*w):int(1.5*w)] 
-    img2pi = img2[0:h, int(0.5*w):int(1.5*w)] 
-    rst = np.concatenate((img1pi, img2pi), axis=1)
-    # image matrix: height * width
-    for j in range(w-delta,w+delta):
-        weight = 1-0.5*(np.sin(float(j-w)/float(delta)*np.pi/2.0)+1)
-        for i in range(0,h):
-            #  img1 X img2
-            rst[i,j] = weight*img1[i,j+int(0.5*w)]+(1.0-weight)*img2[i,j-int(0.5*w)]
-            #  img2 X img1
-            t = j-w
-            if j<w:
-                t=j+w
-            rst[i,t] = (1.0-weight)*img1[i,j-int(0.5*w)]+weight*img2[i,j+int(0.5*w)]
-
-    return rst
-
 def main():
-    master_file = 'fr_ori.jpg'
-    slave_file  = 'bk_ori.jpg'
+    img_file = 'img/vert_ori.jpg'
 
     start = timeit.default_timer()
 
     if _debug>=1:
-        print('Front file is: ', master_file)
-        print('Back file is: ' , slave_file)
+        print('Front file is: ', img_file)
 
-    master_img = cv2.imread(master_file,cv2.IMREAD_COLOR)
-    slave_img = cv2.imread(slave_file ,cv2.IMREAD_COLOR)
+    img = cv2.imread(img_file,cv2.IMREAD_COLOR)
 
     w=1970
     h=1970
     ml = 237
     mt = 74
-    sl = 352
-    st = 29
     fov = 199
     delta = 75 
-    
-    with open('fisheyelens.conf') as json_data:
-        if _debug>=1:
-            print("Reading config from file...")
-        jsonConf = json.load(json_data)
-        w    =jsonConf["SIZE"]
-        h    =jsonConf["SIZE"]
-        ml   =jsonConf["MLEFT"]
-        mt   =jsonConf["MTOP"]
-        sl   =jsonConf["SLEFT"]
-        st   =jsonConf["STOP"]
-        fov  =jsonConf["FOV"]
-        delta=jsonConf["DELTA"]
 
-    master_img = crop(master_img,ml,mt,w,w)
-    slave_img = crop(slave_img,sl,st,w,w)
+    # crop image into square contain the usable sphere. 
+    img = crop(img,ml,mt,w,w)
 
     if _debug>=2:
-        cv2.imwrite("fr_crop.png",master_img)
-        cv2.imwrite("bk_crop.png",slave_img)
+        cv2.imwrite("img/vert_crop.png",img)
 
     if _debug>=1:
         print("cropped image size: %d*%d pixels " % (w,h))
 
     mapstart = timeit.default_timer()
-    mapx,mapy = buildMap(w,h,fov,False)
+    mapx,mapy = buildVertMap(w,h,fov,False)
     mapstop = timeit.default_timer()
 
     if _debug>=1:
@@ -188,12 +144,11 @@ def main():
     # do our dewarping and save/show the results
 
     oImagestart = timeit.default_timer()
-    master_img = unwarp(master_img,mapx,mapy,'pano_master.png')
-    slave_img = unwarp(slave_img,mapx,mapy,'pano_slave.png')
 
-    vis = smoothBound(master_img,slave_img,w,h,delta)
+    img = unwarp(img,mapx,mapy,'img/pano_vert.png')
 
-    cv2.imwrite("pano.png",vis)
+    cv2.imwrite("img/vertpano.png",img)
+
     oImagestop = timeit.default_timer()
     stop = timeit.default_timer()
 

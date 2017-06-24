@@ -2,6 +2,6 @@ install list
 
 1: pip install virtualenv
 
-2: pip install opencv-python
+2: pip install opencv-python   /   sudo apt-get install python-opencv & sudo apt-get install libopencv-dev python-opencv
 
 *3: pip install opencv-contrib-python
