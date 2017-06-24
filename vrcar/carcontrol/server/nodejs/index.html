@@ -4,7 +4,7 @@
     <title>nodejs control</title>
   </head>
   <body>
-    <div><img id="mjpeg_left" onclick="toggle_fullscreen(this);" src="http://192.168.1.8:80/loading.jpg"></div>
+    <div><img id="mjpeg_left" onclick="toggle_fullscreen(this);" src="http://169.254.37.59:80/loading.jpg"></div>
     alpha:<span id="alpha"></span><br/>
     beta:<span id="beta"></span><br/>
     gamma:<span id="gamma"></span><br/>
@@ -19,7 +19,7 @@
       // MJPEG
       //
       var $mjpeg_left_img=$("#mjpeg_left");
-      var ip_left ="http://192.168.1.8:80"
+      var ip_left ="http://169.254.37.59:80"
 
       var halted = 0;
       var previous_halted = 99;
