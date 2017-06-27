@@ -5,3 +5,5 @@ install list
 2: pip install opencv-python   /   sudo apt-get install python-opencv & sudo apt-get install libopencv-dev python-opencv
 
 *3: pip install opencv-contrib-python
+
+*4: get the mjpeg hard link: sudo ln -s /dev/shm/mjpeg/cam.jpg cam.jpg

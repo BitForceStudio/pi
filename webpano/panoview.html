@@ -1,0 +1,84 @@
+<!doctype html>
+<html>
+  <head>
+    <title>VR set</title>
+  </head>
+  <body>
+    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+    <script src="//aframe.io/releases/0.4.0/aframe.min.js"></script>
+
+    <a-scene>
+      <a-sky id='mjpeg' src='campano.jpg'></a-sky>
+    </a-scene>
+
+    <script type="text/javascript">
+      //
+      // MJPEG
+      //
+      var halted = 0;
+      var previous_halted = 99;
+      var mjpeg_mode = 0;
+      var preview_delay = 0;
+      var sampletime = 10;
+      var $mjpeg =$("#mjpeg");
+
+      $(function() {
+          reload_img();
+          updatePreview(true);
+      });
+
+
+      function myloop(){
+      //setTimeout(function () { 
+          $mjpeg =$("#mjpeg");
+          $mjpeg[0].outerHTML = "<a-sky id=\"mjpeg\" src='campano.jpg'></a-sky>"; 
+          //$mjpeg =$("#mjpeg");
+          //myloop();
+      //  }, 1000);
+      }
+
+      function reload_img () {
+          if(!halted) 
+          {
+              $mjpeg[0].outerHTML = "<a-sky id=\"mjpeg\" src=cam_pic.php?time=" + new Date().getTime() + "&pDelay=" + preview_delay + "></a-sky>";
+          }
+          else 
+          {
+              setTimeout("reload_img()", 500);
+          }
+      }
+
+      function error_img () {
+          setTimeout("$mjpeg[0].outerHTML = \"<a-sky id=\"mjpeg\" src='campano.jpg'></a-sky>\";", 1000);
+      }
+
+      function updatePreview(cycle)
+      {
+          if (cycle !== undefined && cycle == true)
+          {
+              $mjpeg =$("#mjpeg");
+              setTimeout("myloop()", 1000);
+              $mjpeg =$("#mjpeg");
+              $mjpeg[0].outerHTML = "<a-sky id=\"mjpeg\" src=cam_pic_new.php?time=" + new Date().getTime() + "&pDelay=" + preview_delay + "></a-sky>";
+              return;
+          }
+        
+          if (previous_halted != halted)
+          {
+              $mjpeg =$("#mjpeg");
+              if(!halted)
+              {
+                $mjpeg[0].outerHTML = "<a-sky id=\"mjpeg\" src=cam_pic.php?time=" + new Date().getTime() + "&pDelay=" + preview_delay + "></a-sky>";
+              }
+              else
+              {
+                $mjpeg[0].outerHTML = "<a-sky id=\"mjpeg\" src='campano.jpg'></a-sky>"; 
+              }
+          }
+          previous_halted = halted;
+
+      }
+
+    </script>
+  </body>
+</html>
