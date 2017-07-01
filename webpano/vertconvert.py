@@ -7,9 +7,11 @@ import sys, getopt
 import cv2
 import numpy as np
 import time, os
-from pathlib import Path
 import timeit
 import json
+
+from pathlib import Path
+from shutil  import copyfile
 
 _debug=0
 
@@ -121,12 +123,13 @@ def main():
     # do our dewarping and save/show the results
     img_file="cam.jpg"
     while(1):
-        #img_file = 'img/vert_test.jpg'
         img = cv2.imread(img_file,cv2.IMREAD_COLOR)
         img = crop(img,ml,mt,w,w)
         img = unwarp(img,mapx,mapy,'img/pano_tvert.png')
         cv2.imwrite("img/tvertpano.png",img)
-        time.sleep(0.5)
+        time.sleep(0.1)
+        copyfile("img/tvertpano.png", "img/viewpano.png")
+        time.sleep(0.1)
 
 if __name__ == "__main__":
    main()
