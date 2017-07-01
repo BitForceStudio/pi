@@ -9,44 +9,37 @@
     <script src="//aframe.io/releases/0.4.0/aframe.min.js"></script>
 
     <a-scene>
-      <a-sky id='mjpeg' src='panomini.png'></a-sky>
+      <a-assets>
+        <img id="mjpeg_img" src="panomini.png">
+      </a-assets>
+      <a-sky id="panoimg" src="#mjpeg_img"></a-sky>
     </a-scene>
 
     <script type="text/javascript">
       //
       // MJPEG
       //
-      var $mjpeg =$("#mjpeg");
+      var $mjpeg_img =$("#mjpeg_img");
+      var halted = 0;
+      var previous_halted = 99;
+      var mjpeg_mode = 0;
+      var preview_delay = 0;
       
       var localhost=location.host;
       var ip = localhost.substring(0,localhost.indexOf(':'));
       var ip_img="http://"+ip+":80";
 
-      //setTimeout("$mjpeg[0].outerHTML =\"<a-sky id='mjpeg' src='convmini.png'></a-sky>\";", 5000);
-      //setTimeout("$mjpeg[0].outerHTML =\"<a-sky id='mjpeg' src='panomini.png'></a-sky>\";", 5000);
-      //var imgsrc='pano.png';
-      var i=0;
-
-      function myloop(){
-      setTimeout(function () {    //  call a 3s setTimeout when the loop is called
-          if (i%2==1)
-            $mjpeg[0].outerHTML = "<a-sky id=\"mjpeg\" src='panomini.png'></a-sky>";          //  your code here
-          else 
-            $mjpeg[0].outerHTML = "<a-sky id=\"mjpeg\" src='convmini.png'></a-sky>";          //  your code here
-          $mjpeg =$("#mjpeg");
-          i++;  
-          if (i < 10) {            //  if the counter < 10, call the loop function
-            myloop();
-          }                        //  ..  setTimeout()
-        }, 100);
-      }
-      //VR.panorama(imgsrc);
-
       $(function() {
-        myloop();
-          //reload_img();
-          //updatePreview(true);
+        setTimeout(setimage, 3000);
+        //reload_img();
+        //updatePreview(true);
       });
+
+      function setimage(){
+        var sceneEl = document.querySelector('a-scene');
+        var entityEl=sceneEl.querySelector('#panoimg');
+        entityEl.setAttribute('material', 'src', 'convmini.png');
+      }
 
       function toggle_fullscreen(e) {
 
@@ -71,7 +64,7 @@
       function reload_img () {
           if(!halted) 
           {
-              $mjpeg_img[0].src = ip_img+"/cam_pic.php?time=" + new Date().getTime() + "&pDelay=" + preview_delay;
+              $mjpeg_img[0].src = ip_img+"/cam_pic_pano.php?time=" + new Date().getTime() + "&pDelay=" + preview_delay;
           }
           else 
           {
@@ -81,7 +74,7 @@
 
 
       function error_img () {
-          setTimeout("mjpeg_img.src  = "+ip_img +"'/cam_pic.php?time='       + new Date().getTime();", 100);
+          setTimeout("mjpeg_img[0].src  = "+ip_img +"'/cam_pic_pano.php?time='       + new Date().getTime();", 100);
       }
 
       function updatePreview(cycle)
@@ -89,7 +82,7 @@
           if (cycle !== undefined && cycle == true)
           {
               $mjpeg_img[0].src = ip_img+"/updating.jpg";
-              setTimeout("$mjpeg_img[0].src = \" " + ip_img + "/cam_pic_new.php?time=\"       + new Date().getTime()  + \"&pDelay=\" + preview_delay;", 1000);
+              setTimeout("$mjpeg_img[0].src = \" " + ip_img + "/cam_pic_pano_new.php?time=\"       + new Date().getTime()  + \"&pDelay=\" + preview_delay;", 1000);
               return;
           }
         
@@ -97,7 +90,7 @@
           {
               if(!halted)
               {
-                  $mjpeg_left_img[0].src  = ip_img +"/cam_pic.php?time="       + new Date().getTime() + "&pDelay=" + preview_delay;
+                  $mjpeg_left_img[0].src  = ip_img +"/cam_pic_pano.php?time="       + new Date().getTime() + "&pDelay=" + preview_delay;
               }
               else
               {
