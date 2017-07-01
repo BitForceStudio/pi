@@ -49,34 +49,34 @@ def readVertJsonMap(w,h,jsonMap):
 
     return map_x, map_y
 
-def buildVertJsonMap(w,h,fov):
+def buildVertJsonMap(src_s,dist_s,fov):
     if _debug>=1:
         print("Building map...")
 
-    map_x = np.zeros((h,w*2),np.float32)
-    map_y = np.zeros((h,w*2),np.float32)
+    map_x = np.zeros((dist_s,dist_s*2),np.float32)
+    map_y = np.zeros((dist_s,dist_s*2),np.float32)
     vfov=fov/180*np.pi
 
-    imgObj = {"SIZE":2*w*h}
+    imgObj = {"SIZE":2*dist_s*dist_s}
     imgMapX = []
     imgMapY = []
 
     hfpi = 0.5 * np.pi
     
-    for y in range(0,int(h)):
-        phi    = np.pi*(float(y)/float(h))
+    for y in range(0,int(dist_s)):
+        phi    = np.pi*(float(y)/float(dist_s))
         sinPhi = np.sin(phi)
 
-        for x in range(0,int(w*2)):
+        for x in range(0,int(dist_s*2)):
 
-            theta = np.pi*(float(x)/float(w)-1)
-            r=w*phi/vfov
+            theta = np.pi*(float(x)/float(dist_s)-1)
+            r=src_s*phi/vfov
 
             if sinPhi<0:
-                r=w*180/fov-abs(r)
+                r=src_s*180/fov-abs(r)
 
-            xS = int(0.5*w+r*np.cos(theta))
-            yS = int(0.5*w+r*np.sin(theta))
+            xS = int(0.5*src_s+r*np.cos(theta))
+            yS = int(0.5*src_s+r*np.sin(theta))
 
             map_x.itemset((y,x),xS)
             map_y.itemset((y,x),yS)
@@ -112,9 +112,11 @@ def main():
     ml  = 35
     mt  = 6
     fov = 199
+    src_s = w
+    dist_s = 512
 
     # crop image into square contain the usable sphere. 
-    mapx,mapy = buildVertMap(w,h,fov,False)
+    mapx,mapy = buildVertMap(src_s,dist_s,fov,True)
     print("Finished reading map...")
     # do our dewarping and save/show the results
     img_file="cam.jpg"
