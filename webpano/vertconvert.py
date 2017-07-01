@@ -127,9 +127,9 @@ def main():
         img = crop(img,ml,mt,w,w)
         img = unwarp(img,mapx,mapy,'img/pano_tvert.png')
         cv2.imwrite("img/tvertpano.png",img)
-        time.sleep(0.1)
+        time.sleep(0.05)
         copyfile("img/tvertpano.png", "img/viewpano.png")
-        time.sleep(0.1)
+        time.sleep(0.05)
 
 if __name__ == "__main__":
    main()
