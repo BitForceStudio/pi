@@ -15,23 +15,37 @@
       //$mjpeg = $("#mjpeg")
       var counter=0;
       var total = 10;
+      var preview_delay = 100;
       var sceneEl = document.querySelector('a-scene');
       var entityEl=sceneEl.querySelector('#panoimg');
       var idsetimg=0;
 
       $(function() {
-        idsetimg = setInterval(setimage, 100);
+        //setimage();
+        //updatePreview(true);
+        idsetimg = setInterval(setimage, 200);
       });
 
       function setimage(){
+
         try{
           //$mjpeg[0].src = 'img/viewpano.png?time=' + new Date().getTime();
           entityEl.setAttribute('material', 'src', 'img/viewpano.png?time=' + new Date().getTime());
+          //entityEl.setAttribute('material', 'src', 'cam_pano.php?time=' + new Date().getTime());
         }
         catch(err)
         {
           clearInterval(idsetimg);
         }
+      }
+
+      function updatePreview(cycle)
+      {
+          if (cycle !== undefined && cycle == true)
+          {
+              setTimeout("entityEl.setAttribute('material', 'src', 'cam_new_pano.php?time='+ new Date().getTime());", 1000);
+              return;
+          }
       }
     </script>
   </body>

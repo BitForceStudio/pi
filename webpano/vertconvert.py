@@ -115,7 +115,7 @@ def main():
     mt  = 6
     fov = 199
     src_s = w
-    dist_s = 512
+    dist_s = 128
 
     # crop image into square contain the usable sphere. 
     mapx,mapy = buildVertMap(src_s,dist_s,fov,True)
