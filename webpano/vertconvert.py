@@ -117,8 +117,9 @@ def main():
     mapx,mapy = buildVertMap(w,h,fov,False)
     print("Finished reading map...")
     # do our dewarping and save/show the results
+    img_file="cam.jpg"
     while(1):
-        img_file = 'img/vert_test.jpg'
+        #img_file = 'img/vert_test.jpg'
         img = cv2.imread(img_file,cv2.IMREAD_COLOR)
         img = crop(img,ml,mt,w,w)
         img = unwarp(img,mapx,mapy,'img/pano_tvert.png')

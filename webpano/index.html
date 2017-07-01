@@ -10,7 +10,7 @@
 
     <a-scene>
       <a-assets>
-        <img id="mjpeg_img" src="img/panomini.png">
+        <img id="mjpeg_img" src="img/tvertpano.png">
       </a-assets>
       <a-sky id="panoimg" src="#mjpeg_img"></a-sky>
     </a-scene>
@@ -30,7 +30,7 @@
       var ip_img="http://"+ip+":80";
 
       $(function() {
-        setInterval(setimage, 50);
+        setInterval(setimage, 100);
         //reload_img();
         //updatePreview(true);
       });
@@ -38,7 +38,7 @@
       function setimage(){
         var sceneEl = document.querySelector('a-scene');
         var entityEl=sceneEl.querySelector('#panoimg');
-        entityEl.setAttribute('material', 'src', 'img/tvertpano.png');
+        entityEl.setAttribute('material', 'src', 'img/tvertpano.png?time=' + new Date().getTime());
       }
 
       function toggle_fullscreen(e) {
