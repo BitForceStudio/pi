@@ -120,7 +120,7 @@ def crop(img,left,top,w,h):
 
 
 def main():
-    master_file = 'test1.jpg'
+    master_file = 'img/test2vert.jpg'
 
     start = timeit.default_timer()
 
@@ -129,45 +129,45 @@ def main():
 
     master_img = cv2.imread(master_file,cv2.IMREAD_COLOR)
 
-    w=1861
-    h=1861
-    ml = 351
-    mt = 83
-    fov = 185
-    delta = 75 
+    rows= master_img.shape
 
+    w   = 2200
+    h   = 2200
+    ml  = 241
+    mt  = 0
+    fov = float(220)
 
+    # resize the cropped image
+    atop = 150
+    abottom = 2200-150-rows[0]
+    print("rows:%d" % (rows[0]))
     master_img = crop(master_img,ml,mt,w,w)
 
+    M = np.float32([[1,0,0],[0,1,atop]])
+
+    master_img = cv2.warpAffine(master_img,M,(2200,2200))
+
     if _debug>=2:
-        cv2.imwrite("convert.png",master_img)
+        cv2.imwrite("resizecrpped.png",master_img)
 
     if _debug>=1:
         print("cropped image size: %d*%d pixels " % (w,h))
 
-    mapstart = timeit.default_timer()
+    # build map
+    mapstart  = timeit.default_timer()
     mapx,mapy = buildMap(w,h,fov,True)
-    mapstop = timeit.default_timer()
+    mapstop   = timeit.default_timer()
 
     if _debug>=1:
         print("MAP DONE cost %d sec" % (mapstop-mapstart))
 
     # do our dewarping and save/show the results
 
-    oImagestart = timeit.default_timer()
-    master_img = unwarp(master_img,mapx,mapy,'convertpano.png')
 
-    oImagestop = timeit.default_timer()
-    stop = timeit.default_timer()
+    img = unwarp(master_img,mapx,mapy,'convertpanotest.png')
 
-    onepi_img = crop(master_img,int(w/2),0,w,w)
-    cv2.imwrite("onepi.png",onepi_img)
+    cv2.imwrite("convertpanotest.png",img)
 
-    if _debug>=1:
-        print("Output Image DONE cost %d sec" % (oImagestop-oImagestart))
-
-    if _debug>=1:
-        print("Finished cost %d sec" % (stop-start))
 
 if __name__ == "__main__":
    main()

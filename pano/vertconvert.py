@@ -109,7 +109,7 @@ def crop(img,left,top,w,h):
     return crop_img
 
 def main():
-    img_file = 'img/vert_test.jpg'
+    img_file = 'img/vert_ori.jpg'
 
     start = timeit.default_timer()
 
@@ -118,29 +118,35 @@ def main():
 
     img = cv2.imread(img_file,cv2.IMREAD_COLOR)
 
-    #w   = 1970
-    #h   = 1970
-    #ml  = 352
-    #mt  = 29
-    #fov = 199
+    w   = 1970
+    h   = 1970
+    ml  = 200
+    mt  = 19
+    fov = float(222)
 
-    w   = 394
-    h   = 394
-    ml  = 35
-    mt  = 6
-    fov = 199
+    #w   = 2200
+    #h   = 2200
+    #ml  = 241
+    #mt  = 0
+    #fov = float(220)
+
+    #w   = 394
+    #h   = 394
+    #ml  = 35
+    #mt  = 6
+    #fov = 199
 
     # crop image into square contain the usable sphere. 
     img = crop(img,ml,mt,w,w)
 
     if _debug>=2:
-        cv2.imwrite("img/vert_tcrop.png",img)
+        cv2.imwrite("img/vert_crop.png",img)
 
     if _debug>=1:
         print("cropped image size: %d*%d pixels " % (w,h))
 
     mapstart = timeit.default_timer()
-    mapx,mapy = buildVertMap(w,h,fov,False)
+    mapx,mapy = buildVertMap(w,h,fov,True)
     mapstop = timeit.default_timer()
 
     if _debug>=1:
@@ -150,9 +156,9 @@ def main():
 
     oImagestart = timeit.default_timer()
 
-    img = unwarp(img,mapx,mapy,'img/pano_tvert.png')
+    img = unwarp(img,mapx,mapy,'img/pano_vert.png')
 
-    cv2.imwrite("img/tvertpano.png",img)
+    cv2.imwrite("../webpano/img/vertpano.png",img)
 
     oImagestop = timeit.default_timer()
     stop = timeit.default_timer()
