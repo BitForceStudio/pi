@@ -10,7 +10,7 @@ import sys, getopt
 import cv2
 import numpy as np
 
-_debug=1
+_debug=2
 
 """
 input:
@@ -104,7 +104,6 @@ def buildMap(sz_src,sz_out,fov,qvert):
         map_x     = 0.5*sz_src+(np.dot(R[:].reshape(sz_out,1),np.cos(Theta).reshape(1,2*sz_out))).astype('float32')
         map_y     = 0.5*sz_src+(np.dot(R[:].reshape(sz_out,1),np.sin(Theta).reshape(1,2*sz_out))).astype('float32')
 
-
     return map_x, map_y
 
     
@@ -112,7 +111,6 @@ def buildMap(sz_src,sz_out,fov,qvert):
 
 def unwarp(img,xmap,ymap):
     rst=cv2.remap(img,xmap,ymap,cv2.INTER_LINEAR)
-
     return rst
 
 
@@ -122,20 +120,20 @@ def crop(img,left,top,sz):
 
 
 def main():
-    imgFile = 'img/test2vert.jpg'
+    imgFile = 'test.jpg'
 
     if _debug>=1:
         print('Front file is: ', imgFile)
 
     img = cv2.imread(imgFile,cv2.IMREAD_COLOR)
 
-    sz_src   = 2200
-    sz_out   = 1024
+    sz_src   = 2200   # source image size in pixel after squaring
+    sz_out   = 2200   # output pano image hight in pixel
     ml       = 241    # modified pixels from left
     mt       = 0      # modified pixels from top
     fov      = float(220)
     
-    # square the image
+    # square the image, better to get full circular image
     rows= img.shape
     atop = 150        # modified pixels from top
     abottom = sz_src-atop-rows[0]
@@ -153,7 +151,7 @@ def main():
         print("cropped image size: %d*%d pixels " % (sz_src,sz_src))
 
     # build map
-    mapx,mapy = buildMap(sz_src,sz_out,fov,True)
+    mapx,mapy = buildMap(sz_src,sz_out,fov,False)
 
     # apply map and output image
     img = unwarp(img,mapx,mapy)
